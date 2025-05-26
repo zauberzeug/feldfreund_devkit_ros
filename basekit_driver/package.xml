@@ -16,6 +16,7 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>gps_msgs</exec_depend>
   <exec_depend>pyserial</exec_depend>
   <exec_depend>ros2launch</exec_depend>
   <exec_depend>tf_transformations</exec_depend>
