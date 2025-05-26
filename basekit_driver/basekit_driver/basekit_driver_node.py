@@ -12,6 +12,7 @@ from basekit_driver.communication.serial_communication import SerialCommunicatio
 from basekit_driver.modules.bms_handler import BMSHandler
 from basekit_driver.modules.bumper_handler import BumperHandler
 from basekit_driver.modules.configuration_handler import ConfigurationHandler
+from basekit_driver.modules.esp_handler import ESPHandler
 from basekit_driver.modules.estop_handler import EStopHandler
 from basekit_driver.modules.odom_handler import OdomHandler
 from basekit_driver.modules.twist_handler import TwistHandler
@@ -34,7 +35,7 @@ class BasekitDriver(Node):
         self._estop_handler = EStopHandler(self, self._serial_communication)
         self._configuration_handler = ConfigurationHandler(
             self, self._serial_communication)
-
+        self._esp_handler = ESPHandler(self, self._serial_communication)
         self.read_timer = self.create_timer(0.05, self.read_data)
 
     def read_data(self):

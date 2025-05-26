@@ -7,6 +7,8 @@
     twist_stddev: [0.01, 0.0, 0.0, 0.0, 0.0, 0.01] # [m/s]
     publish_tf: False
     expander_name: "p0" # Name of the expander in the lizard configuration
+    flash_parameters: "-j nano --nand" # Parameters for espresso.py (e.g., "-j nano --nand" for "flash.py nand")
+    serial_port: "/dev/ttyTHS1" # This needs to be in the docker-compose.yml file as well
 
     ## This section maps Lizard's core output to ROS parameters.
     ## Each entry in the list corresponds to a value that can be read from the Lizard core module.

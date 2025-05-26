@@ -9,7 +9,7 @@ from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import BatteryState
-from std_msgs.msg import Bool, Empty
+from std_msgs.msg import Bool, Empty, String
 
 
 class NiceGuiNode(Node):
@@ -18,6 +18,7 @@ class NiceGuiNode(Node):
         super().__init__('nicegui')
         self.cmd_vel_publisher = self.create_publisher(Twist, 'cmd_vel', 1)
         self.configure_publisher = self.create_publisher(Empty, 'configure', 1)
+        self.esp_control_publisher = self.create_publisher(String, 'esp_control', 1)
 
         # Create reliable QoS profile for emergency stop
         estop_qos = QoSProfile(
@@ -72,6 +73,14 @@ class NiceGuiNode(Node):
                     self.estop1 = ui.label('E-Stop 1 (vorne): ---').classes('text-sm')
                     self.estop2 = ui.label('E-Stop 2 (hinten): ---').classes('text-sm')
             with ui.card().classes('w-[48rem] items-center mt-3'):
+                ui.label('ESP Control').classes('text-2xl')
+                with ui.row().classes('gap-4'):
+                    ui.button('Enable', color='green', on_click=lambda: self.send_esp_control('enable')).classes('w-24')
+                    ui.button('Disable', color='red', on_click=lambda: self.send_esp_control('disable')).classes('w-24')
+                    ui.button('Reset', color='orange', on_click=lambda: self.send_esp_control('reset')).classes('w-24')
+                    ui.button('Soft Reset', color='blue',
+                              on_click=lambda: self.send_esp_control('soft_reset')).classes('w-24')
+            with ui.card().classes('w-[48rem] items-center mt-3'):
                 ui.label('GPS Map').classes('text-2xl')
                 self.map = ui.leaflet(center=(48.137154, 11.576124), zoom=16).classes('w-full h-96')
                 self.marker = self.map.marker(latlng=self.map.center)
@@ -92,6 +101,12 @@ class NiceGuiNode(Node):
             self.estop_button.props('color=blue')
             self.estop_button.text = 'EMERGENCY STOP'
             self.estop_button.classes('w-40 min-h-[3rem]')  # Maintain width and height
+
+    def send_esp_control(self, command: str) -> None:
+        """Send ESP control command."""
+        msg = String()
+        msg.data = command
+        self.esp_control_publisher.publish(msg)
 
     def send_speed(self, x: float, y: float) -> None:
         msg = Twist()

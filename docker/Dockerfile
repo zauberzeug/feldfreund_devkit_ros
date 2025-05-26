@@ -22,18 +22,20 @@ RUN apt-get update && apt-get install -y \
         git \
         nano \
         wget \
+        unzip \
         iputils-ping
 
 # Setup lizard
 RUN mkdir -p /root/.lizard && \
     cd /root && \
-    git clone https://github.com/zauberzeug/lizard.git && \
-    cp lizard/flash.py /root/.lizard/flash.py && \
-    cp lizard/esp.py /root/.lizard/esp.py && \
-    chmod +x /root/.lizard/flash.py && \
-    cd lizard && \
+    LATEST_VERSION=$(curl -s https://api.github.com/repos/zauberzeug/lizard/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")') && \
+    wget https://github.com/zauberzeug/lizard/releases/download/${LATEST_VERSION}/lizard_firmware_and_devtools_${LATEST_VERSION}.zip && \
+    unzip lizard_firmware_and_devtools_${LATEST_VERSION}.zip -d /root/.lizard && \
+    chmod +x /root/.lizard/espresso.py && \
+    cd /root/.lizard && \
     pip install -r requirements.txt && \
-    cd .. && \
+    cd /root && \
+    rm -f lizard_firmware_and_devtools_${LATEST_VERSION}.zip && \
     echo "export PYTHONPATH=/root/.lizard:$PYTHONPATH" >> /root/.bashrc
 
 # https://github.com/zauberzeug/nicegui/issues/2354
