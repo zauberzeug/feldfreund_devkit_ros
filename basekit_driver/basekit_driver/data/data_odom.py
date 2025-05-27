@@ -29,7 +29,7 @@ class DataOdom:
         self._odom.header.stamp = current_time.to_msg()
         self._odom.twist.twist.linear.x = linear_speed
         self._odom.twist.twist.angular.z = angular_speed
-        # self._logger.info(f'{} and {current_twist.linear.x}')
+        # self._logger.info('Current twist linear x: ' + str(current_twist.linear.x))
         self._odom.pose.pose = calculate_current_pose(
             self._odom.pose.pose,
             self._odom.twist.twist,

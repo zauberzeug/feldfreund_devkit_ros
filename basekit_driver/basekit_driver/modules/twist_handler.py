@@ -32,7 +32,7 @@ class TwistHandler:
 
     def update(self, data: Twist) -> None:
         """Read the data from a list of words."""
-        # self._logger.info(f'{data}')
+        # self._logger.info('Data: ' + str(data))
         self._twist = data
 
     def cmd_callback(self, cmd_msg: Twist):

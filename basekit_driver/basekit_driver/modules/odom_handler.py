@@ -29,11 +29,11 @@ class OdomHandler:
         node.declare_parameter('twist_stddev', np.zeros(36).tolist())
         twist_stddev = node.get_parameter('twist_stddev')
         twist_cov = np.asarray(np.diag(twist_stddev.value)).reshape(-1)
-        self._logger.debug(f'Linear twist convariance {twist_cov}')
+        self._logger.debug('Linear twist convariance ' + str(twist_cov))
         node.declare_parameter('pose_stddev', np.zeros(36).tolist())
         pose_stddev = node.get_parameter('pose_stddev')
         pose_cov = np.asarray(np.diag(pose_stddev.value)).reshape(-1)
-        self._logger.debug(f'Linear pose convariance {pose_cov}')
+        self._logger.debug('Linear pose convariance ' + str(pose_cov))
         node.declare_parameter('publish_tf', False)
         self._publish_tf = node.get_parameter('publish_tf').value
 
@@ -54,7 +54,7 @@ class OdomHandler:
 
     def update(self, data: dict) -> None:
         """Read the data from a list of words."""
-        self._logger.debug('%s', data)
+        self._logger.debug(str(data))
 
         self._data.update_data(
             self._clock.now(),
