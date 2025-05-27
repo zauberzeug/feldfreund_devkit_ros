@@ -3,9 +3,7 @@
 """
 
 import os
-from typing import Optional
 
-import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 
