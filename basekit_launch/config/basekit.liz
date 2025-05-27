@@ -42,14 +42,18 @@ imu = Imu()
 rdyp_status = Input(39)
 vdp_status = p0.Input(39)
 
-let stop do wheels.speed(0, 0);end
-when estop_1.level == 0 then stop(); end
-when estop_2.level == 0 then stop(); end
-when bumper_front_top.level == 1 then stop(); end
-when bumper_front_bottom.level == 1 then stop(); end
-when bumper_back.level == 1 then stop(); end
+bool disabled = false
+let disable do disabled = true; wheels.disable();end
+let enable do disabled = false; wheels.enable();end
+bool estop_active = false
+when estop_1.active == false and estop_2.active == false then estop_active = false; end
+when estop_1.active == true or estop_2.active == true then estop_active = true; end
+bool bumper_active = false
+when bumper_front_top.active == false and bumper_front_bottom.active == false and bumper_back.active == false then bumper_active = false; end
+when bumper_front_top.active == true or bumper_front_bottom.active == true or bumper_back.active == true then bumper_active = true; end
+when estop_active == false and disabled == true and bumper_active == false then enable(); end
+when estop_active or bumper_active then disable(); end
 when core.last_message_age > 1000 then wheels.speed(0, 0); end
-when core.last_message_age > 20000 then stop(); end
 
 core.output("core.millis wheels.linear_speed:3 wheels.angular_speed:3 l0.motor_error_flag r0.motor_error_flag l1.motor_error_flag r1.motor_error_flag estop_1.active estop_2.active battery_control_status.level bumper_front_top.active bumper_front_bottom.active bumper_back.active imu.cal_gyr imu.quat_w:4 imu.quat_x:4 imu.quat_y:4 imu.quat_z:4 rdyp_status.level vdp_status.level core.heap")
 rdyp.on()
