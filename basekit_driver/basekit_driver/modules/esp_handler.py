@@ -18,14 +18,13 @@ class ESPHandler:
     def __init__(self, node: Node, serial_comm: SerialCommunication):
         """Initialize ESP handler."""
         self._logger = node.get_logger()
-        self._logger.info('Initializing ESP handler')
         self._espresso_path = '/root/.lizard/espresso.py'
         self._serial_comm = serial_comm
 
         # Get flash parameters from configuration
         node.declare_parameter('flash_parameters', '')
         self._flash_parameters = node.get_parameter('flash_parameters').value
-        self._logger.info(f'Using flash parameters: {self._flash_parameters}')
+        self._logger.info('Using flash parameters: ' + str(self._flash_parameters))
 
         # Create subscriber for ESP control
         self._control_sub = node.create_subscription(
@@ -35,8 +34,10 @@ class ESPHandler:
             10
         )
 
-        # enable esp
-        # self.enable()
+        # Enable ESP by default unless explicitly set to false
+        node.declare_parameter('enable_esp_on_startup', True)
+        if node.get_parameter('enable_esp_on_startup').value:
+            self.enable()
 
     def _execute_command(self, command: str) -> bool:
         """Execute espresso command and return success status."""
@@ -47,38 +48,33 @@ class ESPHandler:
         cmd_parts.append(command)
 
         full_command = ' '.join(cmd_parts)
-        self._logger.info(f'Executing command: {full_command}')
+        self._logger.info('Executing command: ' + full_command)
         result = os.system(full_command)
         success = result == 0
         if success:
-            self._logger.info(f'Command {command} executed successfully')
+            self._logger.info('Command ' + command + ' executed successfully')
         else:
-            self._logger.error(f'Command {command} failed with code {result}')
+            self._logger.error('Command ' + command + ' failed with code ' + str(result))
         return success
 
     def _handle_control_message(self, msg: String) -> None:
         """Handle incoming ESP control messages."""
-        self._logger.info(f'Received ESP control command: {msg.data}')
+        self._logger.info('Received ESP control command: ' + msg.data)
 
         if msg.data == 'enable':
             self._logger.info('Enabling ESP')
-            print('Enabling ESP', flush=True)
             self.enable()
         elif msg.data == 'disable':
             self._logger.info('Disabling ESP')
-            print('Disabling ESP', flush=True)
             self.disable()
         elif msg.data == 'reset':
             self._logger.info('Resetting ESP')
-            print('Resetting ESP', flush=True)
             self.reset()
         elif msg.data == 'soft_reset':
             self._logger.info('Soft resetting ESP')
-            print('Soft resetting ESP', flush=True)
             self.soft_reset()
         else:
-            print('Unknown command received: {msg.data}', flush=True)
-            self._logger.warning(f'Unknown command received: {msg.data}')
+            self._logger.warning('Unknown command received: ' + msg.data)
 
     def enable(self) -> bool:
         """Enable the ESP."""
