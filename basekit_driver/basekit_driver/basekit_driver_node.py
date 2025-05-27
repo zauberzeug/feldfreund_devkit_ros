@@ -36,6 +36,11 @@ class BasekitDriver(Node):
         self._configuration_handler = ConfigurationHandler(
             self, self._serial_communication)
         self._esp_handler = ESPHandler(self, self._serial_communication)
+
+        # Temporary fix to clear any buffered data before starting to read
+        if self._serial_communication.serial is not None:
+            self._serial_communication.serial.reset_input_buffer()
+
         self.read_timer = self.create_timer(0.05, self.read_data)
 
     def read_data(self):
