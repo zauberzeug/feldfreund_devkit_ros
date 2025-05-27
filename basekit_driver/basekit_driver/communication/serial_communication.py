@@ -3,7 +3,6 @@
     Modified by Zauberzeug GmbH
 """
 
-import os
 from functools import reduce
 from operator import ixor
 from threading import Lock
@@ -49,6 +48,12 @@ class SerialCommunication(Communication):
         super().__init__()
         self._logger = node.get_logger()
         self._logger.info('Init serial communication')
+
+        # Get serial port from parameter
+        node.declare_parameter('serial_port', '/dev/ttyTHS0')
+        self._serial_port = node.get_parameter('serial_port').value
+        self._logger.info('Using serial port: ' + self._serial_port)
+
         self.serial: serial.Serial | None = self.open_serial_port()
         self.mutex = Lock()
 
@@ -66,7 +71,7 @@ class SerialCommunication(Communication):
         node.declare_parameter('read_data.list', rclpy.Parameter.Type.STRING_ARRAY)
         # Get the parameter
         data_list = node.get_parameter('read_data.list').value
-        self._logger.info(f'Received list of strings: {data_list}')
+        self._logger.info('Received list of strings: ' + str(data_list))
 
         pos = 0
         for data in data_list:
@@ -88,29 +93,17 @@ class SerialCommunication(Communication):
         for data in self._core_data_list:
             self._core_data[data.get_name()] = data.get_default()
 
-    def enable(self):
-        """
-        Enable serial communication.
-
-        Enable serial communication. There we need to call the flash
-        python script from the lizard driver.
-        """
-        self._logger.info('Enable esp')
-        # TODO: only used with old robots, probably remove
-        command = '/root/.lizard/flash.py enable'
-        os.system(command)
-        self._logger.info('Esp is now enabled')
-
     def open_serial_port(self) -> serial.Serial | None:
         """Open port to device."""
         try:
-            self.enable()
-            # self.port.open()
-            serial_port = serial.Serial('/dev/ttyTHS0', 115200)
-            assert isinstance(serial_port, serial.Serial)
+            serial_port = serial.Serial(self._serial_port, 115200)
+            self._logger.info('Successfully opened serial port ' + self._serial_port)
             return serial_port
-        except (serial.SerialException, AssertionError):
-            self._logger.error('Could not open serial communication!')
+        except serial.SerialException as e:
+            self._logger.error('Could not open serial port ' + self._serial_port + ': ' + str(e))
+            return None
+        except Exception as e:
+            self._logger.error('Unexpected error opening serial port: ' + str(e))
             return None
 
     def calculate_checksum(self, line: str) -> int:
@@ -139,8 +132,8 @@ class SerialCommunication(Communication):
 
     def handle_core_message(self, words: list[str]) -> None:
         """Handle core message."""
-        self._logger.debug(f'{words}')
-        words.pop(0)
+        self._logger.debug(str(words))
+        words = words[1:]
         for data in self._core_data_list:
             if data.get_type() == 'bool':
                 value: Any = words[data.get_pos()]
@@ -155,10 +148,14 @@ class SerialCommunication(Communication):
             elif data.get_type() == 'double':
                 value = float(words[data.get_pos()])
             else:
+                self._logger.error('Unknown data type: ' + str(data.get_type()))
                 return
-
             self._core_data[data.get_name()] = value
-        self.notify_core_observers(self._core_data)
+        try:
+            self.notify_core_observers(self._core_data)
+        except Exception:
+            self._logger.error('Error notifying core observers')
+            raise
 
     def handle_expander_message(self, words: list[str]):
         """Handle expander message."""
@@ -178,7 +175,7 @@ class SerialCommunication(Communication):
         # Split lines if we found multiple lines
         lines = decoded_buffer.split('\n')
         for line in lines:
-            self._logger.debug('%s', line)
+            self._logger.debug('Read line: ' + line)
             stripped_line = line.rstrip()
             if stripped_line[-3:-2] == '@' and stripped_line.count('@') == 1:
                 if not self.validate_checksum(line):
@@ -187,13 +184,14 @@ class SerialCommunication(Communication):
             words = stripped_line.split()
             try:
                 if not any(words):
+                    self._logger.debug('No words')
                     return
                 if words[0] == 'core':
                     self.handle_core_message(words)
                 elif words[0] == f'{self._expander_name}:':
                     self.handle_expander_message(words)
                 elif words[0] == 'error':
-                    self._logger.error(f'{line}')
+                    self._logger.error(line)
             except BaseException:
-                self._logger.error(
-                    f'General exception in the following line: {line} from the following buffer {buffer!r}')
+                self._logger.error('General exception in the following line: ' +
+                                   line + ' from the following buffer ' + str(buffer))
