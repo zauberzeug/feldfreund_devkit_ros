@@ -130,6 +130,7 @@ To access the user interface (UI), follow these steps:
 The system can be started using different launch files:
 
 - `basekit.launch.py`: Launches all components
+- `basekit_nocams.launch.py`: Launches all components without the cameras
 - `field_friend.launch.py`: Launches only Field Friend driver
 - `camera_system.launch.py`: Launches complete camera system (USB + AXIS) and Foxglove Bridge
 - `usb_camera.launch.py`: Launches USB camera only
@@ -160,3 +161,43 @@ curl --digest -u root:pw "http://192.168.42.3/axis-cgi/admin/param.cgi?action=up
 ```
 
 Replace `root:pw` with your camera's credentials and `192.168.42.3` with your camera's IP address. The authentication mode can be set to either `basic` or `digest`. Note that you should always use the `--digest` flag in these commands even when switching to basic auth, as the camera's current setting might be using digest authentication.
+
+## Quickstart guide
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/zauberzeug/basekit_ros.git
+cd basekit_ros
+```
+
+### 2. Validate Configuration
+
+Before building, check and adjust if needed:
+
+1. **ROS2 Configuration** (`basekit_launch/config/basekit.yaml`):
+
+   - Verify `serial_port` matches your setup (default: "/dev/ttyTHS0")
+   - Check `flash_parameters` for your hardware (default: "-j orin --nand")
+
+2. **Lizard Configuration** (`basekit_launch/config/basekit.liz`):
+   - Verify motor configuration matches your hardware
+   - Check pin assignments for bumpers and emergency stops
+   - Adjust any other hardware-specific settings
+
+### 3. Build with Docker
+
+```bash
+./docker.sh u
+```
+
+### 4. Send Lizard Configuration
+
+Once the system is running:
+
+- Use the "Send Lizard Config" button in the UI
+- Or use the `/configure` topic in ROS2
+
+### 5. Ready to Go
+
+Check the UI at `http://<ROBOT-IP>:80` to control and monitor your robot.
