@@ -67,7 +67,7 @@ The example UI provides a robot control interface built with NiceGUI, featuring 
 The interface is accessible through a web browser at `http://<ROBOT-IP>:80` when the robot is running.
 
 <div align="center">
-  <img src="assets/ExampleUI.png" alt="Example UI Screenshot" width="500"/>
+  <img src="assets/BasekitUI.png" alt="Example UI Screenshot" width="500"/>
   <div style="font-size: 0.95em; color: #555; margin-top: 0.5em;">
     Example UI: Control, data, safety, and GPS map in one interface.
   </div>
