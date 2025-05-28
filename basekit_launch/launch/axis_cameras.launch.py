@@ -17,7 +17,7 @@ def generate_launch_description():
 
     # Load secrets
     try:
-        with open(secrets_file, 'r') as f:
+        with open(secrets_file) as f:
             secrets = yaml.safe_load(f)
             username = secrets['axis_cameras']['username']
             password = secrets['axis_cameras']['password']

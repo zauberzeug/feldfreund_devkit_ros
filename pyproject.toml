@@ -5,14 +5,25 @@ check_untyped_defs = true
 
 [[tool.mypy.overrides]]
 module = [
+    "actionlib.*",
+    "actionlib_msgs.*",
+    "ament_copyright.*",
+    "ament_index_python.*",
+    "ament_flake8.*",
+    "ament_pep257.*",
     "coloredlogs.*",
-    "fiona.*",
-    "icecream.*",
-    "geopandas.*",
-    "pynmea2.*",
+    "geometry_msgs.*",
+    "gps_msgs.*",
+    "launch.*",
+    "launch_ros.*",
+    "nav_msgs.*",
+    "rclpy.*",
+    "sensor_msgs.*",
     "serial.*",
-    "shapely.*",
-    "geographiclib.*",
+    "std_msgs.*",
+    "tf2_geometry_msgs.*",
+    "tf2_ros.*",
+    "tf_transformations.*"
 ]
 ignore_missing_imports = true
 
@@ -34,6 +45,16 @@ disable = [
     "W1203",  # Use % formatting in logging functions
     "W1514",  # Using open without explicitly specifying an encoding
     "W0511",  # TODO: comments
+]
+ignored-modules = [
+    "geometry_msgs",
+    "nav_msgs",
+    "sensor_msgs",
+    "serial",
+    "std_msgs",
+    "rclpy",
+    "tf2_ros",
+    "tf_transformations"
 ]
 
 

@@ -1,4 +1,4 @@
-from launch import LaunchDescription
+from launch import LaunchDescription  # type: ignore
 from launch_ros.actions import Node
 
 
