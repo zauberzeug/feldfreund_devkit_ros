@@ -38,10 +38,7 @@ RUN mkdir -p /root/.lizard && \
     rm -f lizard_firmware_and_devtools_${LATEST_VERSION}.zip && \
     echo "export PYTHONPATH=/root/.lizard:$PYTHONPATH" >> /root/.bashrc
 
-# https://github.com/zauberzeug/nicegui/issues/2354
-RUN python3 -m pip install fastapi==0.108.0
-RUN python3 -m pip install setuptools==58.2.0
-RUN python3 -m pip install nicegui
+RUN pip install -r requirements-dev.txt
 
 COPY ./docker/bashrc /tmp/bashrc
 RUN cat /tmp/bashrc >> /root/.bashrc && rm -f /tmp/bashrc
