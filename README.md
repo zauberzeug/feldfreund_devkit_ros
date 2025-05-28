@@ -201,3 +201,11 @@ Once the system is running:
 ### 5. Ready to Go
 
 Check the UI at `http://<ROBOT-IP>:80` to control and monitor your robot.
+
+## Future features
+
+This repository is still work in progress. Please feel free to contribute or reach out to us, if you need any unimplemented feature.
+
+- Complete tf2 frames
+- Handle camera calibrations
+- Robot visualization
