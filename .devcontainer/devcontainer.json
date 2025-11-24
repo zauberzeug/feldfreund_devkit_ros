@@ -1,5 +1,5 @@
 {
-  "name": "basekit_ros",
+  "name": "devkit_ros",
   "build": {
     "dockerfile": "../docker/Dockerfile",
     "context": ".."

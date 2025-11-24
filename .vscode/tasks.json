@@ -13,9 +13,9 @@
     },
     {
       "label": "Build and run",
-      "detail": "Build workspace and run basekit launch file",
+      "detail": "Build workspace and run devkit launch file",
       "type": "shell",
-      "command": "colcon build && source /workspace/install/setup.bash &&ros2 launch basekit basekit.launch.py",
+      "command": "colcon build && source /workspace/install/setup.bash &&ros2 launch devkit devkit.launch.py",
       "group": "build",
       "presentation": {
         "reveal": "always",

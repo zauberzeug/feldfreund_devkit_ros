@@ -27,4 +27,4 @@ log/
 build/
 install/
 
-basekit_launch/config/secrets.yaml
+devkit_launch/config/secrets.yaml
