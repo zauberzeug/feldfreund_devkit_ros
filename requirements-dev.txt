@@ -1,6 +1,7 @@
 -r requirements.txt
-autopep8
+pytest
+pytest-asyncio
 mypy
-pre-commit
 pylint
 ruff
+pre-commit

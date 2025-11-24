@@ -1,24 +1,24 @@
-# BaseKit ROS
+# Feldfreund DevKit ROS
 
-BaseKit ROS is a comprehensive ROS2 package that handles the communication and configuration of various field friend components:
+Feldfreund DevKit ROS is a comprehensive ROS2 package that handles the communication and configuration of various field friend components:
 
 - Communication with Lizard (ESP32) to control the Field Friend
 - GNSS positioning system
 - Camera systems (USB and AXIS cameras)
 - Example UI to control the robot
 
-All launch files and configuration files (except for the UI) are stored in the `basekit_launch` package.
+All launch files and configuration files (except for the UI) are stored in the `devkit_launch` package.
 
 ## Components
 
-### Basekit driver
+### DevKit driver
 
-The BaseKit driver (based on [ATB Potsdam's field_friend_driver](https://github.com/ATB-potsdam-automation/field_friend_driver)) manages the communication with the ESP32 microcontroller running [Lizard](https://lizard.dev/) firmware - a domain-specific language for defining hardware behavior on embedded systems.
+The DevKit driver (based on [ATB Potsdam's field_friend_driver](https://github.com/ATB-potsdam-automation/field_friend_driver)) manages the communication with the ESP32 microcontroller running [Lizard](https://lizard.dev/) firmware - a domain-specific language for defining hardware behavior on embedded systems.
 
 The package provides:
 
-- `config/basekit.liz`: Basic Lizard configuration for BaseKit robot
-- `config/basekit.yaml`: Corresponding ROS2 driver configuration
+- `config/devkit.liz`: Basic Lizard configuration for DevKit robot
+- `config/devkit.yaml`: Corresponding ROS2 driver configuration
 
 Available ROS2 topics:
 
@@ -55,9 +55,9 @@ The GNSS system uses the [Septentrio GNSS driver](https://github.com/septentrio-
 - `/gpsfix`: Detailed GPS fix information including satellites and quality
 - `/aimplusstatus`: AIM+ status information
 
-### Basekit UI
+### DevKit UI
 
-The example UI provides a robot control interface built with NiceGUI, featuring a joystick control similar to turtlesim. It gives you access to and visualization of all topics made available by the BaseKit driver, including:
+The example UI provides a robot control interface built with NiceGUI, featuring a joystick control similar to turtlesim. It gives you access to and visualization of all topics made available by the DevKit driver, including:
 
 - Robot movement control through a joystick interface
 - Real-time visualization of GNSS data
@@ -67,7 +67,7 @@ The example UI provides a robot control interface built with NiceGUI, featuring 
 The interface is accessible through a web browser at `http://<ROBOT-IP>:80` when the robot is running.
 
 <div align="center">
-  <img src="assets/BasekitUI.png" alt="Example UI Screenshot" width="500"/>
+  <img src="assets/DevKitUI.png" alt="Example UI Screenshot" width="500"/>
   <div style="font-size: 0.95em; color: #555; margin-top: 0.5em;">
     Example UI: Control, data, safety, and GPS map in one interface.
   </div>
@@ -93,7 +93,7 @@ docker-compose up -d
 3. Attach to running container:
 
 ```bash
-docker-compose exec basekit bash
+docker-compose exec devkit bash
 ```
 
 4. Stop containers:
@@ -129,8 +129,8 @@ To access the user interface (UI), follow these steps:
 
 The system can be started using different launch files:
 
-- `basekit.launch.py`: Launches all components
-- `basekit_nocams.launch.py`: Launches all components without the cameras
+- `devkit.launch.py`: Launches all components
+- `devkit_nocams.launch.py`: Launches all components without the cameras
 - `field_friend.launch.py`: Launches only Field Friend driver
 - `camera_system.launch.py`: Launches complete camera system (USB + AXIS) and Foxglove Bridge
 - `usb_camera.launch.py`: Launches USB camera only
@@ -141,7 +141,7 @@ The system can be started using different launch files:
 To launch the complete system:
 
 ```bash
-ros2 launch basekit_launch basekit.launch.py
+ros2 launch devkit_launch devkit.launch.py
 ```
 
 ## AXIS Camera Authentication
@@ -167,20 +167,20 @@ Replace `root:pw` with your camera's credentials and `192.168.42.3` with your ca
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/zauberzeug/basekit_ros.git
-cd basekit_ros
+git clone https://github.com/zauberzeug/devkit_ros.git
+cd devkit_ros
 ```
 
 ### 2. Validate Configuration
 
 Before building, check and adjust if needed:
 
-1. **ROS2 Configuration** (`basekit_launch/config/basekit.yaml`):
+1. **ROS2 Configuration** (`devkit_launch/config/devkit.yaml`):
 
    - Verify `serial_port` matches your setup (default: "/dev/ttyTHS0")
    - Check `flash_parameters` for your hardware (default: "-j orin --nand")
 
-2. **Lizard Configuration** (`basekit_launch/config/basekit.liz`):
+2. **Lizard Configuration** (`devkit_launch/config/devkit.liz`):
    - Verify motor configuration matches your hardware
    - Check pin assignments for bumpers and emergency stops
    - Adjust any other hardware-specific settings

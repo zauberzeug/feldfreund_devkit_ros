@@ -1,2 +1,2 @@
-nicegui==2.18.0
-numpy==2.2.6
+nicegui
+rosys

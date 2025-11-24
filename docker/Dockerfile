@@ -44,14 +44,14 @@ COPY ./docker/bashrc /tmp/bashrc
 RUN cat /tmp/bashrc >> /root/.bashrc && rm -f /tmp/bashrc
 
 # Copy ROS packages
-COPY ./basekit_driver /workspace/src/basekit_driver
-COPY ./basekit_launch /workspace/src/basekit_launch
-COPY ./basekit_ui /workspace/src/basekit_ui
+COPY ./devkit_driver /workspace/src/devkit_driver
+COPY ./devkit_launch /workspace/src/devkit_launch
+COPY ./devkit_ui /workspace/src/devkit_ui
 
 # Build ROS packages
 WORKDIR /workspace
 RUN . /opt/ros/humble/setup.sh && \
-    colcon build --packages-select basekit_driver basekit_launch basekit_ui --symlink-install && \
+    colcon build --packages-select devkit_driver devkit_launch devkit_ui --symlink-install && \
     . install/setup.sh
 
 WORKDIR /workspace

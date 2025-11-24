@@ -1,0 +1,91 @@
+[tool.mypy]
+python_version = "3.11"
+install_types = true
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = [
+    "actionlib.*",
+    "actionlib_msgs.*",
+    "ament_copyright.*",
+    "ament_index_python.*",
+    "ament_flake8.*",
+    "ament_pep257.*",
+    "coloredlogs.*",
+    "geometry_msgs.*",
+    "gps_msgs.*",
+    "launch.*",
+    "launch_ros.*",
+    "nav_msgs.*",
+    "rclpy.*",
+    "sensor_msgs.*",
+    "serial.*",
+    "std_msgs.*",
+    "tf2_geometry_msgs.*",
+    "tf2_ros.*",
+    "tf_transformations.*"
+]
+ignore_missing_imports = true
+
+
+[tool.pylint]
+disable = [
+    "C0103",  # Invalid name (e.g., variable/function/class naming conventions)
+    "C0111",  # Missing docstring (in function/class/method)
+    "C0301",  # Line too long (exceeds character limit)
+    "R0902",  # Too many public methods
+    "R0903",  # Too few public methods
+    "R0904",  # Too many public methods
+    "R0912",  # Too many branches
+    "R0913",  # Too many arguments
+    "R0914",  # Too many local variables
+    "R0915",  # Too many statements
+    "W0102",  # Dangerous default value as argument
+    "W0718",  # Catching too general exception
+    "W1203",  # Use % formatting in logging functions
+    "W1514",  # Using open without explicitly specifying an encoding
+    "W0511",  # TODO: comments
+]
+ignored-modules = [
+    "geometry_msgs",
+    "nav_msgs",
+    "sensor_msgs",
+    "serial",
+    "std_msgs",
+    "rclpy",
+    "tf2_ros",
+    "tf_transformations"
+]
+
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle
+    "F",  # pyflakes
+    "W",  # pycodestyle
+    "B",  # bugbear
+    "I",  # isort
+    "RUF", # ruff
+    "UP", # pyupgrade
+    "PL", # pylint
+    "N", # pep8-naming
+]
+ignore = [
+    "E501", # Line too long
+    "N806", # variable should be lowercase
+    "N813", # CamelCase imported as lower_case
+    "N818", # enforce CustomError(Exception) name suffix
+    "PLR0912", # Too many branches
+    "PLR0913", # Too many arguments
+    "PLR0915", # Too many arguments
+    "PLR2004", # Magic value comparison
+    "PLR0911", # Too many return statements
+]
+
+[tool.ruff.format]
+quote-style = "single"
