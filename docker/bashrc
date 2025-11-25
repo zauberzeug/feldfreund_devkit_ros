@@ -1,6 +1,6 @@
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
-test -f /opt/ros/humble/local_setup.bash && \
-    source /opt/ros/humble/local_setup.bash
+test -f /opt/ros/jazzy/local_setup.bash && \
+    source /opt/ros/jazzy/local_setup.bash
 test -f /workspace/install/local_setup.bash && \
     source /workspace/install/local_setup.bash

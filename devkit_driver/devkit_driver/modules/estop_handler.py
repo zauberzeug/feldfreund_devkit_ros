@@ -17,9 +17,7 @@ class EStopHandler:
         self._logger = node.get_logger()
         self._comm = comm
         self._software_estop: bool = False
-        self.subscription = node.create_subscription(
-            Bool, 'emergency_stop', self.callback, 10
-        )
+        self.subscription = node.create_subscription(Bool, 'emergency_stop', self.callback, 10)
         # Add publishers for hardware estops
         self.estop1_publisher = node.create_publisher(Bool, 'estop1_state', 10)
         self.estop2_publisher = node.create_publisher(Bool, 'estop2_state', 10)

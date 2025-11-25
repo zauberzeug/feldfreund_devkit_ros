@@ -5,6 +5,8 @@
 """
 
 import rclpy
+
+# from feldfreund_devkit import System
 from rclpy.executors import SingleThreadedExecutor
 from rclpy.node import Node
 
@@ -14,7 +16,8 @@ from devkit_driver.modules.bumper_handler import BumperHandler
 from devkit_driver.modules.configuration_handler import ConfigurationHandler
 from devkit_driver.modules.esp_handler import ESPHandler
 from devkit_driver.modules.estop_handler import EStopHandler
-from devkit_driver.modules.odom_handler import OdomHandler
+
+# from devkit_driver.modules.odom_handler import OdomHandler
 from devkit_driver.modules.twist_handler import TwistHandler
 
 
@@ -27,8 +30,10 @@ class DevkitDriver(Node):
         # Declare parameters
         self.declare_parameter('startup_file', '')
 
+        # self._system = System(robot_id='f23')
+
         self._serial_communication = SerialCommunication(self)
-        self._odom_handler = OdomHandler(self, self._serial_communication)
+        # self._odom_handler = OdomHandler(self, self._serial_communication)
         self._bms_handler = BMSHandler(self, self._serial_communication)
         self._bumper_handler = BumperHandler(self, self._serial_communication)
         self._twist_handler = TwistHandler(self, self._serial_communication)
