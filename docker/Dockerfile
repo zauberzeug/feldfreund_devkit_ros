@@ -29,16 +29,17 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /root/.lizard && \
     cd /root && \
     LATEST_VERSION=$(curl -s https://api.github.com/repos/zauberzeug/lizard/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")') && \
-    wget https://github.com/zauberzeug/lizard/releases/download/${LATEST_VERSION}/lizard_firmware_and_devtools_${LATEST_VERSION}.zip && \
-    unzip lizard_firmware_and_devtools_${LATEST_VERSION}.zip -d /root/.lizard && \
+    wget https://github.com/zauberzeug/lizard/releases/download/${LATEST_VERSION}/lizard_firmware_and_devtools_${LATEST_VERSION}_esp32.zip && \
+    unzip lizard_firmware_and_devtools_${LATEST_VERSION}_esp32.zip -d /root/.lizard && \
     chmod +x /root/.lizard/espresso.py && \
     cd /root/.lizard && \
     pip install -r requirements.txt && \
     cd /root && \
-    rm -f lizard_firmware_and_devtools_${LATEST_VERSION}.zip && \
+    rm -f lizard_firmware_and_devtools_${LATEST_VERSION}_esp32.zip && \
     echo "export PYTHONPATH=/root/.lizard:$PYTHONPATH" >> /root/.bashrc
 
-RUN pip install -r requirements-dev.txt
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
 
 COPY ./docker/bashrc /tmp/bashrc
 RUN cat /tmp/bashrc >> /root/.bashrc && rm -f /tmp/bashrc
