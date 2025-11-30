@@ -25,9 +25,9 @@ Available ROS2 topics:
 - `/cmd_vel` (geometry_msgs/Twist): Control robot movement
 - `/odom` (nav_msgs/Odometry): Robot odometry data
 - `/battery_state` (sensor_msgs/BatteryState): Battery status information
-- `/bumper_front_top_state` (std_msgs/Bool): Front top bumper state
-- `/bumper_front_bottom_state` (std_msgs/Bool): Front bottom bumper state
-- `/bumper_back_state` (std_msgs/Bool): Back bumper state
+- `/bumper/front_top` (std_msgs/Bool): Front top bumper state
+- `/bumper/front_bottom` (std_msgs/Bool): Front bottom bumper state
+- `/bumper/back` (std_msgs/Bool): Back bumper state
 - `/emergency_stop` (std_msgs/Bool): Software emergency stop control
 - `/estop1_state` (std_msgs/Bool): Hardware emergency stop 1 state
 - `/estop2_state` (std_msgs/Bool): Hardware emergency stop 2 state

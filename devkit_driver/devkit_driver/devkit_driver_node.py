@@ -1,75 +1,56 @@
 #!/usr/bin/env python3
 
-""" Copyright (c) 2024 Leibniz-Institut für Agrartechnik und Bioökonomie e.V. (ATB)
-    Modified by Zauberzeug GmbH
-"""
+import threading
+from pathlib import Path
 
 import rclpy
-
-# from feldfreund_devkit import System
-from rclpy.executors import SingleThreadedExecutor
+from feldfreund_devkit import System, api
+from feldfreund_devkit.config import config_from_file
+from nicegui import app, ui, ui_run
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 
-from devkit_driver.communication.serial_communication import SerialCommunication
-from devkit_driver.modules.bms_handler import BMSHandler
-from devkit_driver.modules.bumper_handler import BumperHandler
-from devkit_driver.modules.configuration_handler import ConfigurationHandler
-from devkit_driver.modules.esp_handler import ESPHandler
-from devkit_driver.modules.estop_handler import EStopHandler
-
-# from devkit_driver.modules.odom_handler import OdomHandler
-from devkit_driver.modules.twist_handler import TwistHandler
+from devkit_driver.modules import BMSHandler, BumperHandler, EStopHandler, OdomHandler, RobotBrainHandler, TwistHandler
 
 
 class DevkitDriver(Node):
     """Devkit node handler."""
 
-    def __init__(self):
+    def __init__(self, system: System):
         super().__init__('devkit_driver_node')
-
+        self.system = system
         # Declare parameters
         self.declare_parameter('startup_file', '')
 
-        # self._system = System(robot_id='f23')
-
-        self._serial_communication = SerialCommunication(self)
-        # self._odom_handler = OdomHandler(self, self._serial_communication)
-        self._bms_handler = BMSHandler(self, self._serial_communication)
-        self._bumper_handler = BumperHandler(self, self._serial_communication)
-        self._twist_handler = TwistHandler(self, self._serial_communication)
-        self._estop_handler = EStopHandler(self, self._serial_communication)
-        self._configuration_handler = ConfigurationHandler(
-            self, self._serial_communication)
-        self._esp_handler = ESPHandler(self, self._serial_communication)
-
-        # Temporary fix to clear any buffered data before starting to read
-        if self._serial_communication.serial is not None:
-            self._serial_communication.serial.reset_input_buffer()
-
-        self.read_timer = self.create_timer(0.05, self.read_data)
-
-    def read_data(self):
-        """Read data from the serial communication."""
-        self._serial_communication.read()
+        self._robot_brain_handler = RobotBrainHandler(self, self.system.feldfreund.robot_brain)
+        self._odom_handler = OdomHandler(self, self.system.odometer)
+        self._bms_handler = BMSHandler(self, self.system.feldfreund.bms)
+        self._bumper_handler = BumperHandler(self, self.system.feldfreund.bumper)
+        self._twist_handler = TwistHandler(self, self.system.feldfreund.wheels)
+        self._estop_handler = EStopHandler(self, self.system.feldfreund.estop)
 
 
-def main(args=None):
-    """Implmenets main function call."""
-    rclpy.init(args=args)
+def main() -> None:
+    # NOTE: This function is defined as the ROS entry point in setup.py, but it's empty to enable NiceGUI auto-reloading
+    pass
 
+
+def on_startup() -> None:
+    config = config_from_file('/workspace/src/f23.py')
+    system = System(config)
+    api.Online()
+    threading.Thread(target=ros_main, args=(system,)).start()
+
+
+def ros_main(system: System) -> None:
+    rclpy.init()
+    devkit_driver = DevkitDriver(system)
     try:
-        devkit_driver = DevkitDriver()
-
-        executor = SingleThreadedExecutor()
-        executor.add_node(devkit_driver)
-
-        try:
-            executor.spin()
-        finally:
-            executor.shutdown()
-    finally:
-        rclpy.shutdown()
+        rclpy.spin(devkit_driver)
+    except ExternalShutdownException:
+        pass
 
 
-if __name__ == '__main__':
-    main()
+app.on_startup(on_startup)
+ui_run.APP_IMPORT_STRING = f'{__name__}:app'  # ROS2 uses a non-standard module name, so we need to specify it here
+ui.run(uvicorn_reload_dirs=str(Path(__file__).parent.resolve()), favicon='🤖')

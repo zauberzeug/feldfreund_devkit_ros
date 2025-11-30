@@ -1,45 +1,34 @@
-""" Copyright (c) 2024 Leibniz-Institut für Agrartechnik und Bioökonomie e.V. (ATB)
-    Modified by Zauberzeug GmbH
-"""
-
-from geometry_msgs.msg import PoseStamped
 from rclpy.node import Node
+from rosys.hardware import Bms
+from rosys.hardware.bms_state import BmsState
 from sensor_msgs.msg import BatteryState
-
-from devkit_driver.communication.communication import Communication
-from devkit_driver.data.data_bms import DataBMS
 
 
 class BMSHandler:
     """Handle the odometry."""
 
-    def __init__(
-            self,
-            node: Node,
-            comm: Communication):
-
-        self._logger = node.get_logger()
-        self._comm = comm
-        self._clock = node.get_clock()
-        self.current_pose = PoseStamped()
-        self._node = node
+    def __init__(self, node: Node, bms: Bms):
+        self.log = node.get_logger()
+        self.node = node
         self._publisher = node.create_publisher(BatteryState, 'battery_state', 10)
+        self._bms = bms
+        self._bms.STATE_UPDATED.subscribe(self._handle_bms_update)
 
-        comm.register_bms_observer(self)
-        self._send_request_timer = node.create_timer(1, self.send_request)
-
-    def update(self, data: dict) -> None:
-        """Read the data from a list of words."""
-        try:
-            data_bms = DataBMS([int(w, 16) for w in data])
-            data_bms.check()
-        except AssertionError:
-            self._logger.error('Cannot read data!')
+    def _handle_bms_update(self, state: BmsState) -> None:
+        """Handle BMS update event."""
+        if None in (state.voltage, state.current, state.percentage, state.temperature):
+            self.log.warning('BMS state has None values, skipping publish')
             return
-        msg = data_bms.get_ros_message()
-        msg.header.stamp = self._clock.now().to_msg()
-        self._publisher.publish(msg)
+        message = self._state_to_ros_message(state)
+        self._publisher.publish(message)
 
-    def send_request(self):
-        """Send twist to serial."""
-        self._comm.send('bms.send(0xdd, 0xa5, 0x03, 0x00, 0xff, 0xfd, 0x77)')
+    def _state_to_ros_message(self, state: BmsState) -> BatteryState:
+        """Convert BMS state to ROS BatteryState."""
+        message = BatteryState()
+        # TODO: rosys time to ros time
+        message.header.stamp = self.node.get_clock().now().to_msg()
+        message.voltage = float(state.voltage)
+        message.current = float(state.current)
+        message.percentage = float(state.percentage) / 100.0
+        message.temperature = float(state.temperature)
+        return message

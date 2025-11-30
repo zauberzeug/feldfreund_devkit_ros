@@ -17,6 +17,7 @@ services:
     volumes:
       - /dev:/dev # Access to all devices (alternative to individual mappings)
       - ~/.ros:/root/.ros # For ROS logs
+      - ../:/workspace/src
     environment:
       - ROS_DOMAIN_ID=0 # Default ROS domain
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp # Using CycloneDDS

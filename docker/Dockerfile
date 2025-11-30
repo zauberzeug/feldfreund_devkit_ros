@@ -48,6 +48,7 @@ RUN cat /tmp/bashrc >> /root/.bashrc && rm -f /tmp/bashrc
 COPY ./devkit_driver /workspace/src/devkit_driver
 COPY ./devkit_launch /workspace/src/devkit_launch
 COPY ./devkit_ui /workspace/src/devkit_ui
+COPY ./f23.py /workspace/src/f23.py
 
 # Build ROS packages
 WORKDIR /workspace
