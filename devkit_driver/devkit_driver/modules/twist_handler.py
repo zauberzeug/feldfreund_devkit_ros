@@ -1,5 +1,6 @@
 from geometry_msgs.msg import Twist
 from rclpy.node import Node
+from rosys import background_tasks
 from rosys.hardware import Wheels
 
 
@@ -11,6 +12,6 @@ class TwistHandler:
         self.wheels = wheels
         self.cmd_subscription = node.create_subscription(Twist, 'cmd_vel', self.handle_twist, 10)
 
-    def handle_twist(self, cmd_msg: Twist):
+    def handle_twist(self, cmd_msg: Twist) -> None:
         """Implement callback for cmd_vel message."""
-        self.wheels.drive(cmd_msg.linear.x, cmd_msg.angular.z)
+        background_tasks.create(self.wheels.drive(cmd_msg.linear.x, cmd_msg.angular.z))

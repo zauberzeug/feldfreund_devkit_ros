@@ -4,7 +4,7 @@ import threading
 from pathlib import Path
 
 import rclpy
-from feldfreund_devkit import System, api
+from feldfreund_devkit import FeldfreundHardware, System, api
 from feldfreund_devkit.config import config_from_file
 from nicegui import app, ui, ui_run
 from rclpy.executors import ExternalShutdownException
@@ -22,10 +22,12 @@ class DevkitDriver(Node):
         # Declare parameters
         self.declare_parameter('startup_file', '')
 
+        assert isinstance(self.system.feldfreund, FeldfreundHardware)
         self._robot_brain_handler = RobotBrainHandler(self, self.system.feldfreund.robot_brain)
         self._odom_handler = OdomHandler(self, self.system.odometer)
         self._bms_handler = BMSHandler(self, self.system.feldfreund.bms)
-        self._bumper_handler = BumperHandler(self, self.system.feldfreund.bumper)
+        if self.system.feldfreund.bumper is not None:
+            self._bumper_handler = BumperHandler(self, self.system.feldfreund.bumper)
         self._twist_handler = TwistHandler(self, self.system.feldfreund.wheels)
         self._estop_handler = EStopHandler(self, self.system.feldfreund.estop)
 

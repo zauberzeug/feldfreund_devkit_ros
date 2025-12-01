@@ -24,6 +24,10 @@ class BMSHandler:
 
     def _state_to_ros_message(self, state: BmsState) -> BatteryState:
         """Convert BMS state to ROS BatteryState."""
+        assert state.voltage is not None
+        assert state.current is not None
+        assert state.percentage is not None
+        assert state.temperature is not None
         message = BatteryState()
         # TODO: rosys time to ros time
         message.header.stamp = self.node.get_clock().now().to_msg()

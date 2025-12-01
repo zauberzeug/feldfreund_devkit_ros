@@ -19,13 +19,13 @@ class RobotBrainHandler:
         self._configure_sub = node.create_subscription(Empty, 'esp/configure', self._handle_configure, 10)
 
     def _handle_enable(self, _: Empty) -> None:
-        background_tasks.create(self._robot_brain.enable())
+        background_tasks.create(self._robot_brain.enable_esp())
 
     def _handle_disable(self, _: Empty) -> None:
-        background_tasks.create(self._robot_brain.disable())
+        background_tasks.create(self._robot_brain.disable_esp())
 
     def _handle_reset(self, _: Empty) -> None:
-        background_tasks.create(self._robot_brain.reset())
+        background_tasks.create(self._robot_brain.reset_esp())
 
     def _handle_restart(self, _: Empty) -> None:
         background_tasks.create(self._robot_brain.restart())
