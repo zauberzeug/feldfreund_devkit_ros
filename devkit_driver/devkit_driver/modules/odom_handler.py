@@ -47,7 +47,7 @@ class OdomHandler:
         pose = self.odom.prediction
         quat = Quaternion(axis=[0, 0, 1], angle=pose.yaw)
         velocity = self.odom.current_velocity
-        assert velocity.linear is not None
+        assert velocity is not None
         self._odom_msg.header.stamp = self._node.get_clock().now().to_msg()
         self._odom_msg.pose.pose.position.x = pose.x
         self._odom_msg.pose.pose.position.y = pose.y
