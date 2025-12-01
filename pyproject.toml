@@ -45,6 +45,18 @@ disable = [
     "W0718", # Catching too general exception
 ]
 
+[tool.pylint.'TYPECHECK']
+ignored-modules = [
+    "rclpy",
+    "std_msgs",
+    "sensor_msgs",
+    "geometry_msgs",
+    "nav_msgs",
+    "launch",
+    "launch_ros",
+    "ament_index_python",
+]
+
 [tool.ruff]
 line-length = 120
 indent-width = 4
