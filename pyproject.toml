@@ -10,6 +10,18 @@ requires-python = ">=3.11, <3.14"
 python_version = "3.11"
 check_untyped_defs = true
 
+[[tool.mypy.overrides]]
+module = [
+    "launch.*",
+    "launch_ros.*",
+    "ament_index_python.*",
+    "rclpy.*",
+    "std_msgs.*",
+    "sensor_msgs.*",
+    "geometry_msgs.*",
+]
+ignore_missing_imports = true
+
 [tool.pylint]
 disable = [
     "C0114", # Missing module docstring
