@@ -7,9 +7,9 @@ jobs:
     strategy:
       matrix:
         tools:
-          - command: "mypy ./devkit_driver --non-interactive"
-          - command: "mypy ./devkit_launch --non-interactive"
-          - command: "mypy ./devkit_ui --non-interactive"
+          - command: "mypy ./devkit_driver --non-interactive --install-types"
+          - command: "mypy ./devkit_launch --non-interactive --install-types"
+          - command: "mypy ./devkit_ui --non-interactive --install-types"
           - command: "pylint ./devkit_driver/devkit_driver"
           - command: "pylint ./devkit_ui/devkit_ui"
           - command: "ruff check ./devkit_driver"
