@@ -7,6 +7,8 @@ from std_msgs.msg import Bool
 
 class EStopHandler:
     """Handle the estop."""
+    FRONT_ESTOP_ID = 1
+    BACK_ESTOP_ID = 2
 
     def __init__(self, node: Node, estop: EStop):
         self.log = node.get_logger()
@@ -25,15 +27,15 @@ class EStopHandler:
 
     # TODO
     def _handle_estop_triggered(self) -> None:
-        if 1 in self._estop.pressed_estops:
+        if self.FRONT_ESTOP_ID in self._estop.pressed_estops:
             self.estop_front_publisher.publish(Bool(data=True))
-        if 2 in self._estop.pressed_estops:
+        if self.BACK_ESTOP_ID in self._estop.pressed_estops:
             self.estop_back_publisher.publish(Bool(data=True))
 
     def _handle_estop_released(self) -> None:
-        if 1 not in self._estop.pressed_estops:
+        if self.FRONT_ESTOP_ID not in self._estop.pressed_estops:
             self.estop_front_publisher.publish(Bool(data=False))
-        if 2 not in self._estop.pressed_estops:
+        if self.BACK_ESTOP_ID not in self._estop.pressed_estops:
             self.estop_back_publisher.publish(Bool(data=False))
 
     def soft_estop_callback(self, msg: Bool):
