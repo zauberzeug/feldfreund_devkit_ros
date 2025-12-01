@@ -19,6 +19,7 @@ module = [
     "std_msgs.*",
     "sensor_msgs.*",
     "geometry_msgs.*",
+    "gps_msgs.*",
     "tf2_ros.*",
 ]
 ignore_missing_imports = true
@@ -57,6 +58,7 @@ ignored-modules = [
     "launch_ros",
     "ament_index_python",
     "tf2_ros",
+    "gps_msgs",
 ]
 
 [tool.ruff]
