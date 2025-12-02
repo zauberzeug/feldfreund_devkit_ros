@@ -38,7 +38,7 @@ def main() -> None:
 
 
 def on_startup() -> None:
-    config = config_from_file('/workspace/src/f23.py')
+    config = config_from_file('/workspace/src/devkit_launch/config/feldfreund.py')
     system = System(config)
     api.Online()
     threading.Thread(target=ros_main, args=(system,)).start()
