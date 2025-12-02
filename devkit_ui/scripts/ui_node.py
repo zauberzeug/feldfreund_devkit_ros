@@ -70,20 +70,17 @@ class NiceGuiNode(Node):
                             on_end=lambda _: self.send_speed(0.0, 0.0))
                 ui.label('Publish steering commands by dragging your mouse around in the blue field').classes('mt-6')
 
-                estop_button: ui.button = None
-
                 def update_button_appearance(e: ClickEventArguments) -> None:
                     print(f'update_button_appearance: {e}')
-                    nonlocal estop_button
-                    assert estop_button is not None
+                    assert isinstance(e.sender, ui.button)
                     self.toggle_estop()
                     if self.soft_estop_active:
                         e.sender.props('color=red')
-                        e.sender.set_text('STOPPED')
+                        e.sender.text = 'STOPPED'
                     else:
                         e.sender.props('color=blue')
-                        e.sender.set_text('EMERGENCY STOP')
-                estop_button = ui.button('EMERGENCY STOP', color='blue', on_click=update_button_appearance) \
+                        e.sender.text = 'EMERGENCY STOP'
+                ui.button('EMERGENCY STOP', color='blue', on_click=update_button_appearance) \
                     .classes('w-40 min-h-[3rem]')
             with ui.card().classes('flex-1 text-center items-center'):
                 ui.label('Data').classes('text-2xl')
