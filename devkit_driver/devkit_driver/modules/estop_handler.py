@@ -1,7 +1,7 @@
 import rosys
 from rclpy.node import Node
 from rosys import background_tasks
-from rosys.hardware import EStop
+from rosys.hardware import EStop, EStopHardware
 from std_msgs.msg import Bool
 
 
@@ -23,6 +23,8 @@ class EStopHandler:
         rosys.on_startup(self._check_on_startup)
 
     def _check_on_startup(self) -> None:
+        if not isinstance(self._estop, EStopHardware):
+            return
         for name in self._estop.pins.keys():
             if name in self._estop.active_estops:
                 self._handle_estop_triggered(name)
