@@ -79,10 +79,10 @@ class NiceGuiNode(Node):
                     self.toggle_estop()
                     if self.soft_estop_active:
                         e.sender.props('color=red')
-                        e.sender.text = 'STOPPED'
+                        e.sender.set_text('STOPPED')
                     else:
                         e.sender.props('color=blue')
-                        e.sender.text = 'EMERGENCY STOP'
+                        e.sender.set_text('EMERGENCY STOP')
                 estop_button = ui.button('EMERGENCY STOP', color='blue', on_click=update_button_appearance) \
                     .classes('w-40 min-h-[3rem]')
             with ui.card().classes('flex-1 text-center items-center'):
