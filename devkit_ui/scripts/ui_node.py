@@ -5,6 +5,7 @@ import rclpy
 from geometry_msgs.msg import Twist
 from gps_msgs.msg import GPSFix
 from nicegui import app, ui, ui_run
+from nicegui.events import ClickEventArguments
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
@@ -18,7 +19,11 @@ class NiceGuiNode(Node):
         super().__init__('nicegui')
         self.cmd_vel_publisher = self.create_publisher(Twist, 'cmd_vel', 1)
         self.configure_publisher = self.create_publisher(Empty, 'configure', 1)
-        self.esp_control_publisher = self.create_publisher(String, 'esp_control', 1)
+        self.esp_enable_publisher = self.create_publisher(String, 'esp/enable', 1)
+        self.esp_disable_publisher = self.create_publisher(String, 'esp/disable', 1)
+        self.esp_reset_publisher = self.create_publisher(String, 'esp/reset', 1)
+        self.esp_restart_publisher = self.create_publisher(String, 'esp/restart', 1)
+        self.esp_configure_publisher = self.create_publisher(String, 'esp/configure', 1)
         self.subscription = self.create_subscription(GPSFix, 'gpsfix', self.store_gps, 1)
         self.battery_subscription = self.create_subscription(BatteryState, 'battery_state', self.store_battery, 1)
         self.bumper_front_top_subscription = self.create_subscription(Bool,
@@ -64,8 +69,22 @@ class NiceGuiNode(Node):
                             on_move=lambda e: self.send_speed(float(e.y), float(e.x)),
                             on_end=lambda _: self.send_speed(0.0, 0.0))
                 ui.label('Publish steering commands by dragging your mouse around in the blue field').classes('mt-6')
-                ui.button('EMERGENCY STOP', color='blue', on_click=self.toggle_estop) \
-                    .classes('mt-4 text-white font-bold w-40 min-h-[3rem]')
+
+                estop_button: ui.button = None
+
+                def update_button_appearance(e: ClickEventArguments) -> None:
+                    print(f'update_button_appearance: {e}')
+                    nonlocal estop_button
+                    assert estop_button is not None
+                    self.toggle_estop()
+                    if self.soft_estop_active:
+                        e.sender.props('color=red')
+                        e.sender.text = 'STOPPED'
+                    else:
+                        e.sender.props('color=blue')
+                        e.sender.text = 'EMERGENCY STOP'
+                estop_button = ui.button('EMERGENCY STOP', color='blue', on_click=update_button_appearance) \
+                    .classes('w-40 min-h-[3rem]')
             with ui.card().classes('flex-1 text-center items-center'):
                 ui.label('Data').classes('text-2xl')
                 ui.label('linear velocity').classes('text-xs mb-[-1.8em]')
@@ -80,7 +99,6 @@ class NiceGuiNode(Node):
                 ui.label('Battery').classes('text-xs mb-[-1.4em]')
                 ui.label().bind_text_from(self, 'latest_battery',
                                           lambda msg: f'{msg.percentage * 100:.1f}% ({msg.voltage:.1f}V)' if msg is not None else 'N/A')
-                ui.button('Send Lizard Config', color='green', on_click=self.send_config).classes('mt-4')
             with ui.card().classes('flex-1 text-center items-center'):
                 ui.label('Safety').classes('text-2xl')
                 ui.label('Bumpers').classes('text-xs mb-[-1.4em]')
@@ -106,11 +124,12 @@ class NiceGuiNode(Node):
         with ui.card().classes('w-[48rem] items-center mt-3'):
             ui.label('ESP Control').classes('text-2xl')
             with ui.row().classes('gap-4'):
-                ui.button('Enable', color='green', on_click=lambda: self.send_esp_control('enable')).classes('w-24')
-                ui.button('Disable', color='red', on_click=lambda: self.send_esp_control('disable')).classes('w-24')
-                ui.button('Reset', color='orange', on_click=lambda: self.send_esp_control('reset')).classes('w-24')
-                ui.button('Soft Reset', color='blue',
-                          on_click=lambda: self.send_esp_control('soft_reset')).classes('w-24')
+                ui.button('Enable', color='green', on_click=lambda: self.esp_enable_publisher.publish(Empty())).classes('w-24')
+                ui.button('Disable', color='red', on_click=lambda: self.esp_disable_publisher.publish(Empty())).classes('w-24')
+                ui.button('Reset', color='orange', on_click=lambda: self.esp_reset_publisher.publish(Empty())).classes('w-24')
+                ui.button('Restart', color='blue', on_click=lambda: self.esp_restart_publisher.publish(Empty())).classes('w-24')
+                ui.button('Configure', color='purple', on_click=lambda: self.esp_configure_publisher.publish(Empty())) \
+                    .classes('w-24')
         with ui.card().classes('w-[48rem] items-center mt-3'):
             ui.label('GPS Map').classes('text-2xl')
             leaflet = ui.leaflet(center=(51.98278, 7.43440), zoom=16).classes('w-full h-96')
@@ -130,28 +149,12 @@ class NiceGuiNode(Node):
         msg.data = self.soft_estop_active
         self.estop_publisher.publish(msg)
 
-        # Update button appearance while maintaining size
-        # if self.soft_estop_active:
-        #     self.estop_button.props('color=red')
-        #     self.estop_button.text = 'STOPPED'
-        #     self.estop_button.classes('w-40 min-h-[3rem]')  # Maintain width and height
-        # else:
-        #     self.estop_button.props('color=blue')
-        #     self.estop_button.text = 'EMERGENCY STOP'
-        #     self.estop_button.classes('w-40 min-h-[3rem]')  # Maintain width and height
-
-    def send_esp_control(self, command: str) -> None:
-        """Send ESP control command."""
-        msg = String()
-        msg.data = command
-        self.esp_control_publisher.publish(msg)
-
     def send_speed(self, x: float, y: float) -> None:
         msg = Twist()
         msg.linear.x = x
         msg.angular.z = -y
-        self.linear.value = x
-        self.angular.value = y
+        self.linear_velocity = x
+        self.angular_velocity = y
         self.cmd_vel_publisher.publish(msg)
 
     def store_gps(self, msg: GPSFix) -> None:
@@ -176,11 +179,6 @@ class NiceGuiNode(Node):
 
     def update_estop_back(self, msg: Bool) -> None:
         self.estop_back_active = msg.data
-
-    def send_config(self) -> None:
-        """Send trigger to configuration handler to apply lizard config."""
-        msg = Empty()
-        self.configure_publisher.publish(msg)
 
 
 def main() -> None:

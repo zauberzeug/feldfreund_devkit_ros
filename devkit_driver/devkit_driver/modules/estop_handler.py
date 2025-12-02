@@ -7,8 +7,8 @@ from std_msgs.msg import Bool
 
 class EStopHandler:
     """Handle the estop."""
-    FRONT_ID = 1
-    BACK_ID = 2
+    FRONT_ID = '1'
+    BACK_ID = '2'
 
     def __init__(self, node: Node, estop: EStop):
         self.log = node.get_logger()
@@ -23,19 +23,22 @@ class EStopHandler:
         rosys.on_startup(self._check_on_startup)
 
     def _check_on_startup(self) -> None:
-        self._handle_estop_triggered()
+        for name in self._estop.pins.keys():
+            if name in self._estop.active_estops:
+                self._handle_estop_triggered(name)
+            else:
+                self._handle_estop_released(name)
 
-    # TODO
-    def _handle_estop_triggered(self) -> None:
-        if self.FRONT_ID in self._estop.pressed_estops:
+    def _handle_estop_triggered(self, name: str) -> None:
+        if name == self.FRONT_ID:
             self.estop_front_publisher.publish(Bool(data=True))
-        if self.BACK_ID in self._estop.pressed_estops:
+        elif name == self.BACK_ID:
             self.estop_back_publisher.publish(Bool(data=True))
 
-    def _handle_estop_released(self) -> None:
-        if self.FRONT_ID not in self._estop.pressed_estops:
+    def _handle_estop_released(self, name: str) -> None:
+        if name == self.FRONT_ID:
             self.estop_front_publisher.publish(Bool(data=False))
-        if self.BACK_ID not in self._estop.pressed_estops:
+        elif name == self.BACK_ID:
             self.estop_back_publisher.publish(Bool(data=False))
 
     def soft_estop_callback(self, msg: Bool):

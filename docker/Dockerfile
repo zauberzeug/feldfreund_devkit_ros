@@ -39,7 +39,8 @@ RUN mkdir -p /root/.lizard && \
     echo "export PYTHONPATH=/root/.lizard:$PYTHONPATH" >> /root/.bashrc
 
 COPY requirements.txt /tmp/requirements.txt
-RUN pip install --break-system-packages --ignore-installed -r /tmp/requirements.txt
+RUN --mount=type=cache,target=/home/zauberzeug/.cache/pip \
+    pip install --break-system-packages --ignore-installed -r /tmp/requirements.txt
 
 COPY ./docker/bashrc /tmp/bashrc
 RUN cat /tmp/bashrc >> /root/.bashrc && rm -f /tmp/bashrc

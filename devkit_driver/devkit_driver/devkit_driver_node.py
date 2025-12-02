@@ -27,7 +27,7 @@ class DevkitDriver(Node):
         self._odom_handler = OdomHandler(self, self.system.odometer)
         self._bms_handler = BMSHandler(self, self.system.feldfreund.bms)
         if self.system.feldfreund.bumper is not None:
-            self._bumper_handler = BumperHandler(self, self.system.feldfreund.bumper)
+            self._bumper_handler = BumperHandler(self, self.system.feldfreund.bumper, self.system.feldfreund.estop)
         self._twist_handler = TwistHandler(self, self.system.feldfreund.wheels)
         self._estop_handler = EStopHandler(self, self.system.feldfreund.estop)
 

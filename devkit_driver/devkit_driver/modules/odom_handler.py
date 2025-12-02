@@ -1,4 +1,5 @@
 import numpy as np
+import rosys
 from geometry_msgs.msg import PoseStamped, TransformStamped
 from nav_msgs.msg import Odometry
 from pyquaternion import Quaternion
@@ -40,6 +41,7 @@ class OdomHandler:
         if self._publish_tf:
             self._tf_broadcaster = TransformBroadcaster(self._node)
         self.odom.PREDICTION_UPDATED.subscribe(self.publish_odom)
+        rosys.on_startup(self.publish_odom)
 
     def publish_odom(self):
         """Publish odometry data to ros."""
