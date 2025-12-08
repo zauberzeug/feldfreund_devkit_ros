@@ -4,7 +4,7 @@ from rosys import background_tasks
 from rosys.hardware import EStop, EStopHardware
 from std_msgs.msg import Bool
 
-from .qos_safety import SAFETY_QOS
+from ..qos import SAFETY_QOS
 
 
 class EStopHandler:

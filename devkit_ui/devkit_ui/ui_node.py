@@ -8,9 +8,10 @@ from nicegui import app, ui, ui_run
 from nicegui.events import ClickEventArguments
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import BatteryState
 from std_msgs.msg import Bool, Empty
+
+from devkit_driver import SAFETY_QOS
 
 
 class NiceGuiNode(Node):
@@ -28,19 +29,24 @@ class NiceGuiNode(Node):
         self.bumper_front_top_subscription = self.create_subscription(Bool,
                                                                       'bumper/front_top',
                                                                       self.update_bumper_front_top,
-                                                                      1)
+                                                                      SAFETY_QOS)
         self.bumper_front_bottom_subscription = self.create_subscription(Bool,
                                                                          'bumper/front_bottom',
                                                                          self.update_bumper_front_bottom,
-                                                                         1)
-        self.bumper_back_subscription = self.create_subscription(Bool, 'bumper/back', self.update_bumper_back, 1)
-        # Create reliable QoS profile for emergency stop
-        estop_qos = QoSProfile(reliability=ReliabilityPolicy.RELIABLE,
-                               durability=DurabilityPolicy.TRANSIENT_LOCAL,
-                               depth=1)
-        self.estop_publisher = self.create_publisher(Bool, 'estop/soft', estop_qos)
-        self.estop_front_subscription = self.create_subscription(Bool, 'estop/front', self.update_estop_front, 1)
-        self.estop_back_subscription = self.create_subscription(Bool, 'estop/back', self.update_estop_back, 1)
+                                                                         SAFETY_QOS)
+        self.bumper_back_subscription = self.create_subscription(Bool,
+                                                                 'bumper/back',
+                                                                 self.update_bumper_back,
+                                                                 SAFETY_QOS)
+        self.estop_publisher = self.create_publisher(Bool, 'estop/soft', SAFETY_QOS)
+        self.estop_front_subscription = self.create_subscription(Bool,
+                                                                 'estop/front',
+                                                                 self.update_estop_front,
+                                                                 SAFETY_QOS)
+        self.estop_back_subscription = self.create_subscription(Bool,
+                                                                'estop/back',
+                                                                self.update_estop_back,
+                                                                SAFETY_QOS)
 
         self.bumper_front_top_active = False
         self.bumper_front_bottom_active = False

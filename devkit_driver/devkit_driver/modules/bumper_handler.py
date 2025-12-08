@@ -3,7 +3,7 @@ from rclpy.node import Node
 from rosys.hardware import Bumper, EStop
 from std_msgs.msg import Bool
 
-from .qos_safety import SAFETY_QOS
+from ..qos import SAFETY_QOS
 
 
 class BumperHandler:
