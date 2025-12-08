@@ -107,22 +107,22 @@ class NiceGuiNode(Node):
                 ui.label('Front Top: ---') \
                     .classes('text-sm') \
                     .bind_text_from(self, 'bumper_front_top_active',
-                                    lambda active: 'ACTIVE' if active else 'inactive')
+                                    lambda active: 'Front Top: ' + ('ACTIVE' if active else 'inactive'))
                 ui.label('Front Bottom: ---') \
                     .classes('text-sm') \
                     .bind_text_from(self, 'bumper_front_bottom_active',
-                                    lambda active: 'ACTIVE' if active else 'inactive')
+                                    lambda active: 'Front Bottom: ' + ('ACTIVE' if active else 'inactive'))
                 ui.label('Back: ---') \
                     .classes('text-sm') \
                     .bind_text_from(self, 'bumper_back_active',
-                                    lambda active: 'ACTIVE' if active else 'inactive')
+                                    lambda active: 'Back: ' + ('ACTIVE' if active else 'inactive'))
                 ui.label('E-Stops').classes('text-xs mb-[-1.4em] mt-4')
                 ui.label('E-Stop Front: ---') \
                     .classes('text-sm') \
-                    .bind_text_from(self, 'estop_front_active', lambda active: 'ACTIVE' if active else 'inactive')
+                    .bind_text_from(self, 'estop_front_active', lambda active: 'Front: ' + ('ACTIVE' if active else 'inactive'))
                 ui.label('E-Stop Back: ---') \
                     .classes('text-sm') \
-                    .bind_text_from(self, 'estop_back_active', lambda active: 'ACTIVE' if active else 'inactive')
+                    .bind_text_from(self, 'estop_back_active', lambda active: 'Back: ' + ('ACTIVE' if active else 'inactive'))
         with ui.card().classes('w-[48rem] items-center mt-3'):
             ui.label('ESP Control').classes('text-2xl')
             with ui.row().classes('gap-4'):
