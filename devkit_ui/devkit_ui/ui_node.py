@@ -2,15 +2,21 @@ import threading
 from pathlib import Path
 
 import rclpy
-from devkit_driver.qos import SAFETY_QOS  # pylint: disable=no-name-in-module,import-error
 from geometry_msgs.msg import Twist
 from gps_msgs.msg import GPSFix
 from nicegui import app, ui, ui_run
 from nicegui.events import ClickEventArguments
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
+from rclpy.qos import DurabilityPolicy, Duration, LivelinessPolicy, QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import BatteryState
 from std_msgs.msg import Bool, Empty
+
+SAFETY_QOS = QoSProfile(depth=1,
+                        reliability=ReliabilityPolicy.RELIABLE,
+                        durability=DurabilityPolicy.TRANSIENT_LOCAL,
+                        liveliness=LivelinessPolicy.AUTOMATIC,
+                        liveliness_lease_duration=Duration(seconds=1))
 
 
 class NiceGuiNode(Node):
