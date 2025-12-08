@@ -2,6 +2,7 @@ import threading
 from pathlib import Path
 
 import rclpy
+from devkit_driver.qos import SAFETY_QOS  # pylint: disable=no-name-in-module,import-error
 from geometry_msgs.msg import Twist
 from gps_msgs.msg import GPSFix
 from nicegui import app, ui, ui_run
@@ -10,8 +11,6 @@ from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from sensor_msgs.msg import BatteryState
 from std_msgs.msg import Bool, Empty
-
-from devkit_driver import SAFETY_QOS
 
 
 class NiceGuiNode(Node):
