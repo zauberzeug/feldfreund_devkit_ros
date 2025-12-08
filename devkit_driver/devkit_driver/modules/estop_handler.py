@@ -4,19 +4,21 @@ from rosys import background_tasks
 from rosys.hardware import EStop, EStopHardware
 from std_msgs.msg import Bool
 
+from .qos_safety import SAFETY_QOS
+
 
 class EStopHandler:
     """Handle the estop."""
-    FRONT_ID = '1'
-    BACK_ID = '2'
+    FRONT_ID = 'front'
+    BACK_ID = 'back'
 
     def __init__(self, node: Node, estop: EStop):
         self.log = node.get_logger()
         self._estop = estop
 
         self.subscription = node.create_subscription(Bool, 'estop/soft', self.soft_estop_callback, 10)
-        self.estop_front_publisher = node.create_publisher(Bool, 'estop/front', 10)
-        self.estop_back_publisher = node.create_publisher(Bool, 'estop/back', 10)
+        self.estop_front_publisher = node.create_publisher(Bool, 'estop/front', SAFETY_QOS)
+        self.estop_back_publisher = node.create_publisher(Bool, 'estop/back', SAFETY_QOS)
 
         self._estop.ESTOP_TRIGGERED.subscribe(self._handle_estop_triggered)
         self._estop.ESTOP_RELEASED.subscribe(self._handle_estop_released)

@@ -3,6 +3,8 @@ from rclpy.node import Node
 from rosys.hardware import Bumper, EStop
 from std_msgs.msg import Bool
 
+from .qos_safety import SAFETY_QOS
+
 
 class BumperHandler:
     """Handle the bumper states from core data."""
@@ -12,9 +14,9 @@ class BumperHandler:
         self._bumper = bumper
         self._estop = estop
 
-        self._pub_front_top = node.create_publisher(Bool, 'bumper/front_top', 10)
-        self._pub_front_bottom = node.create_publisher(Bool, 'bumper/front_bottom', 10)
-        self._pub_back = node.create_publisher(Bool, 'bumper/back', 10)
+        self._pub_front_top = node.create_publisher(Bool, 'bumper/front_top', SAFETY_QOS)
+        self._pub_front_bottom = node.create_publisher(Bool, 'bumper/front_bottom', SAFETY_QOS)
+        self._pub_back = node.create_publisher(Bool, 'bumper/back', SAFETY_QOS)
 
         self._bumper.BUMPER_TRIGGERED.subscribe(self._handle_bumper_triggered)
         self._bumper.BUMPER_RELEASED.subscribe(self._handle_bumper_released)
@@ -26,7 +28,6 @@ class BumperHandler:
 
     def _handle_bumper_triggered(self, bumper_name: str) -> None:
         """Handle bumper triggered event."""
-        self.log.warning(f'bumper triggered: {bumper_name} - {self._bumper.active_bumpers} {self._estop.active_estops}')
         if bumper_name == 'front_top':
             self._pub_front_top.publish(Bool(data=True))
         elif bumper_name == 'front_bottom':
@@ -36,7 +37,6 @@ class BumperHandler:
 
     def _handle_bumper_released(self, bumper_name: str) -> None:
         """Handle bumper released event."""
-        self.log.warning(f'bumper released: {bumper_name} - {self._bumper.active_bumpers} {self._estop.active_estops}')
         if bumper_name == 'front_top':
             self._pub_front_top.publish(Bool(data=False))
         elif bumper_name == 'front_bottom':
