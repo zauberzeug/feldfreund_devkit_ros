@@ -10,7 +10,7 @@ from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import BatteryState
-from std_msgs.msg import Bool, Empty, String
+from std_msgs.msg import Bool, Empty
 
 
 class NiceGuiNode(Node):
@@ -18,12 +18,11 @@ class NiceGuiNode(Node):
     def __init__(self) -> None:
         super().__init__('nicegui')
         self.cmd_vel_publisher = self.create_publisher(Twist, 'cmd_vel', 1)
-        self.configure_publisher = self.create_publisher(Empty, 'configure', 1)
-        self.esp_enable_publisher = self.create_publisher(String, 'esp/enable', 1)
-        self.esp_disable_publisher = self.create_publisher(String, 'esp/disable', 1)
-        self.esp_reset_publisher = self.create_publisher(String, 'esp/reset', 1)
-        self.esp_restart_publisher = self.create_publisher(String, 'esp/restart', 1)
-        self.esp_configure_publisher = self.create_publisher(String, 'esp/configure', 1)
+        self.esp_enable_publisher = self.create_publisher(Empty, 'esp/enable', 1)
+        self.esp_disable_publisher = self.create_publisher(Empty, 'esp/disable', 1)
+        self.esp_reset_publisher = self.create_publisher(Empty, 'esp/reset', 1)
+        self.esp_restart_publisher = self.create_publisher(Empty, 'esp/restart', 1)
+        self.esp_configure_publisher = self.create_publisher(Empty, 'esp/configure', 1)
         self.subscription = self.create_subscription(GPSFix, 'gpsfix', self.store_gps, 1)
         self.battery_subscription = self.create_subscription(BatteryState, 'battery_state', self.store_battery, 1)
         self.bumper_front_top_subscription = self.create_subscription(Bool,
