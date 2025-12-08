@@ -29,7 +29,7 @@ then
     echo "Arguments:"
     echo
     echo "  containers    One or more containers (omit to affect all containers)"
-    echo "  container     Excactly one container to be affected"
+    echo "  container     Exactly one container to be affected"
     echo "  command       Command to be executed inside a container"
     exit
 fi

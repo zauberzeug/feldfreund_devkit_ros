@@ -1,5 +1,5 @@
 nicegui==3.3.1
 # rosys==v0.31.0
-rosys @ git+https://github.com/zauberzeug/rosys@fix_event_emit_order#92a90d4b846652f5382c68ee1b01391fdbfb7e7a
+rosys @ git+https://github.com/zauberzeug/rosys.git@6570a5808ec326c12a24f165ee1abdc4acbcd092
 feldfreund_devkit @ git+https://github.com/zauberzeug/feldfreund_devkit@main
 numpy<2.0.0,>=1.20.1
