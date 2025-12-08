@@ -12,7 +12,6 @@ from launch_ros.actions import Node
 def generate_launch_description():
     """Generate launch description for the complete devkit system."""
     pkg_dir = get_package_share_directory('devkit_launch')
-    ui_pkg_dir = get_package_share_directory('devkit_ui')
 
     # Include the GNSS launch file
     gnss_launch = IncludeLaunchDescription(
@@ -31,7 +30,7 @@ def generate_launch_description():
     # Include the UI launch file
     ui_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(ui_pkg_dir, 'launch', 'ui.launch.py')
+            os.path.join(pkg_dir, 'launch', 'ui.launch.py')
         )
     )
 
