@@ -131,7 +131,7 @@ The system can be started using different launch files:
 
 - `devkit.launch.py`: Launches all components
 - `devkit_nocams.launch.py`: Launches all components without the cameras
-- `field_friend.launch.py`: Launches only Field Friend driver
+- `devkit_driver.launch.py`: Launches only Field Friend driver
 - `camera_system.launch.py`: Launches complete camera system (USB + AXIS) and Foxglove Bridge
 - `usb_camera.launch.py`: Launches USB camera only
 - `axis_cameras.launch.py`: Launches AXIS cameras only
