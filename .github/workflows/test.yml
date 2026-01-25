@@ -7,14 +7,9 @@ jobs:
     strategy:
       matrix:
         tools:
-          - command: "mypy ./devkit_driver --non-interactive --install-types"
-          - command: "mypy ./devkit_launch --non-interactive --install-types"
-          - command: "mypy ./devkit_ui --non-interactive --install-types"
-          - command: "pylint ./devkit_driver/devkit_driver"
-          - command: "pylint ./devkit_ui/devkit_ui"
-          - command: "ruff check ./devkit_driver"
-          - command: "ruff check ./devkit_launch"
-          - command: "ruff check ./devkit_ui"
+          - command: "make mypy"
+          - command: "make pylint"
+          - command: "make ruff"
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
