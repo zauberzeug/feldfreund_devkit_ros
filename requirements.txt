@@ -1,5 +1,4 @@
 nicegui==3.3.1
-# rosys==v0.31.0
-rosys @ git+https://github.com/zauberzeug/rosys.git@6570a5808ec326c12a24f165ee1abdc4acbcd092
-feldfreund_devkit @ git+https://github.com/zauberzeug/feldfreund_devkit@main
+rosys<1.0.0,>=0.32.0
+feldfreund_devkit<1.0.0,>=0.1.0
 numpy<2.0.0,>=1.20.1
