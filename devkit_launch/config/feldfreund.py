@@ -11,7 +11,7 @@ from rosys.geometry import Rotation
 
 config = FeldfreundConfiguration(
     robot_id='Feldfreund',
-    bluetooth=BluetoothConfiguration(name='feldfreund', pin_code=None),
+    bluetooth=BluetoothConfiguration(name='feldfreund DevKit', pin_code=None),
     camera=None,
     bumper=BumperConfiguration(pin_front_top=21, pin_front_bottom=35, pin_back=18),
     circle_sight_positions=None,
