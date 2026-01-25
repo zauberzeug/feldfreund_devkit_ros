@@ -29,8 +29,8 @@ Available ROS2 topics:
 - `/bumper/front_bottom` (std_msgs/Bool): Front bottom bumper state
 - `/bumper/back` (std_msgs/Bool): Back bumper state
 - `/estop/soft` (std_msgs/Bool): Software emergency stop control
-- `/estop1_state` (std_msgs/Bool): Hardware emergency stop 1 state
-- `/estop2_state` (std_msgs/Bool): Hardware emergency stop 2 state
+- `/estop/front` (std_msgs/Bool): Hardware front emergency stop state
+- `/estop/back` (std_msgs/Bool): Hardware back emergency stop state
 - `/configure` (std_msgs/Empty): Trigger loading of the Lizard configuration file
 
 ### Camera System
