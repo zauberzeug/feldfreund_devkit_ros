@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 import threading
 from pathlib import Path
 
@@ -65,7 +66,6 @@ class NiceGuiNode(Node):
         self.battery_voltage = 0.0
         self.latest_gps = None
         self.latest_battery = None
-        self.latest_gps = None
 
         @ui.page('/')
         def page():

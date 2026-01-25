@@ -21,15 +21,15 @@ install-ci:
 
 ## mypy		Run mypy type checks.
 mypy:
-	mypy .
+	mypy ./devkit_driver ./devkit_launch ./devkit_ui --exclude 'setup\.py$$' --non-interactive --install-types
 
 ## pylint		Run pylint code analysis.
 pylint:
-	pylint ./feldfreund_devkit_ros
+	pylint ./devkit_driver/devkit_driver ./devkit_launch/launch ./devkit_ui/devkit_ui
 
 ## ruff		Run ruff code analysis.
 ruff:
-	ruff check ./feldfreund_devkit_ros
+	ruff check ./devkit_driver/devkit_driver ./devkit_launch/launch ./devkit_ui/devkit_ui
 
 ## pre-commit	Run pre-commit hooks on all files.
 pre-commit:

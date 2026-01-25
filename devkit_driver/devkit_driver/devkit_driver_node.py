@@ -19,9 +19,6 @@ class DevkitDriver(Node):
     def __init__(self, system: System):
         super().__init__('devkit_driver_node')
         self.system = system
-        # Declare parameters
-        self.declare_parameter('startup_file', '')
-
         assert isinstance(self.system.feldfreund, FeldfreundHardware)
         self._robot_brain_handler = RobotBrainHandler(self, self.system.feldfreund.robot_brain)
         self._odom_handler = OdomHandler(self, self.system.odometer)

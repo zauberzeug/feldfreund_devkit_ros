@@ -5,3 +5,6 @@ mypy
 pylint
 ruff
 pre-commit
+livesync
+types-setuptools
+types-PyYAML

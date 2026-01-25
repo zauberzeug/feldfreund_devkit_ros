@@ -19,8 +19,10 @@ module = [
     "std_msgs.*",
     "sensor_msgs.*",
     "geometry_msgs.*",
+    "nav_msgs.*",
     "gps_msgs.*",
     "tf2_ros.*",
+    "pyquaternion",
 ]
 ignore_missing_imports = true
 
@@ -37,8 +39,6 @@ disable = [
     "R0904", # Too many public methods
     "R0911", # Too many return statements
     "R0912", # Too many branches
-    "R0913", # Too many arguments
-    "R0914", # Too many local variables
     "R0913", # Too many arguments
     "R0914", # Too many local variables
     "R0915", # Too many statements

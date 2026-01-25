@@ -1,4 +1,5 @@
 """Main launch file for the devkit project."""
+# pylint: disable=duplicate-code
 
 import os
 

@@ -45,7 +45,6 @@ class OdomHandler:
 
     def publish_odom(self):
         """Publish odometry data to ros."""
-        self.log.warning('Publishing odometry ' + str(self.odom.prediction))
         pose = self.odom.prediction
         quat = Quaternion(axis=[0, 0, 1], angle=pose.yaw)
         velocity = self.odom.current_velocity
