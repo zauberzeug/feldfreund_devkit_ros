@@ -28,14 +28,14 @@ RUN apt-get update && apt-get install -y \
 # Setup lizard
 RUN mkdir -p /root/.lizard && \
     cd /root && \
-    LATEST_VERSION=v0.9.0 && \
-    wget https://github.com/zauberzeug/lizard/releases/download/${LATEST_VERSION}/lizard_firmware_and_devtools_${LATEST_VERSION}_esp32.zip && \
-    unzip lizard_firmware_and_devtools_${LATEST_VERSION}_esp32.zip -d /root/.lizard && \
+    LIZARD_VERSION=v0.9.0 && \
+    wget https://github.com/zauberzeug/lizard/releases/download/${LIZARD_VERSION}/lizard_firmware_and_devtools_${LIZARD_VERSION}_esp32.zip && \
+    unzip lizard_firmware_and_devtools_${LIZARD_VERSION}_esp32.zip -d /root/.lizard && \
     chmod +x /root/.lizard/espresso.py && \
     cd /root/.lizard && \
     pip install --break-system-packages --ignore-installed -r requirements.txt && \
     cd /root && \
-    rm -f lizard_firmware_and_devtools_${LATEST_VERSION}_esp32.zip && \
+    rm -f lizard_firmware_and_devtools_${LIZARD_VERSION}_esp32.zip && \
     echo "export PYTHONPATH=/root/.lizard:$PYTHONPATH" >> /root/.bashrc
 
 COPY requirements.txt /tmp/requirements.txt
