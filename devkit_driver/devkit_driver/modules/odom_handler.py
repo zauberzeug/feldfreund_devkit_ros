@@ -46,9 +46,13 @@ class OdomHandler:
     def publish_odom(self):
         """Publish odometry data to ros."""
         pose = self.odom.prediction
+        if self._publish_tf:
+            self._tf_broadcaster.sendTransform(self._pose_to_transform_stamped(pose))
         quat = Quaternion(axis=[0, 0, 1], angle=pose.yaw)
         velocity = self.odom.current_velocity
-        assert velocity is not None
+        if velocity is None:
+            self.log.debug('Velocity is None, skipping publish')
+            return
         self._odom_msg.header.stamp = self._node.get_clock().now().to_msg()
         self._odom_msg.pose.pose.position.x = pose.x
         self._odom_msg.pose.pose.position.y = pose.y
@@ -59,10 +63,7 @@ class OdomHandler:
         self._odom_msg.pose.pose.orientation.w = quat.w
         self._odom_msg.twist.twist.linear.x = velocity.linear
         self._odom_msg.twist.twist.angular.z = velocity.angular
-
         self._publisher.publish(self._odom_msg)
-        if self._publish_tf:
-            self._tf_broadcaster.sendTransform(self._pose_to_transform_stamped(pose))
 
     def _pose_to_transform_stamped(self, pose: Pose) -> TransformStamped:
         """Convert pose to transform stamped."""
