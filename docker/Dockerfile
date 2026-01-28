@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y \
 # Setup lizard
 RUN mkdir -p /root/.lizard && \
     cd /root && \
-    LATEST_VERSION=$(curl -s https://api.github.com/repos/zauberzeug/lizard/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")') && \
+    LATEST_VERSION=v0.9.0 && \
     wget https://github.com/zauberzeug/lizard/releases/download/${LATEST_VERSION}/lizard_firmware_and_devtools_${LATEST_VERSION}_esp32.zip && \
     unzip lizard_firmware_and_devtools_${LATEST_VERSION}_esp32.zip -d /root/.lizard && \
     chmod +x /root/.lizard/espresso.py && \
