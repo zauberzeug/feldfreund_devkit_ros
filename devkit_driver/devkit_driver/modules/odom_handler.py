@@ -22,11 +22,11 @@ class OdomHandler:
         node.declare_parameter('twist_stddev', np.zeros(36).tolist())
         twist_stddev = node.get_parameter('twist_stddev')
         twist_cov = np.asarray(np.diag(twist_stddev.value)).reshape(-1)
-        self.log.debug('Linear twist convariance ' + str(twist_cov))
+        self.log.debug('Linear twist covariance ' + str(twist_cov))
         node.declare_parameter('pose_stddev', np.zeros(36).tolist())
         pose_stddev = node.get_parameter('pose_stddev')
         pose_cov = np.asarray(np.diag(pose_stddev.value)).reshape(-1)
-        self.log.debug('Linear pose convariance ' + str(pose_cov))
+        self.log.debug('Linear pose covariance ' + str(pose_cov))
         node.declare_parameter('publish_tf', False)
         self._publish_tf = node.get_parameter('publish_tf').value
 

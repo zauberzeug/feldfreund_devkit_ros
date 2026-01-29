@@ -60,7 +60,7 @@ case $cmd in
         docker-compose $compose_args stop $cmd_args
         ;;
     i | install)
-        echo "disabing restart for any containers which may have been configured before"
+        echo "disabling restart for any containers which may have been configured before"
         docker update --restart=no $(docker ps -a -q) > /dev/null
         echo "configuring running containers to always restart"
         docker update --restart=always $(docker ps -q)
