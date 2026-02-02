@@ -35,6 +35,10 @@ class OdomHandler:
         self._odom_msg.pose.covariance = pose_cov
         self._odom_msg.twist.covariance = twist_cov
 
+        self._transform = TransformStamped()
+        self._transform.header.frame_id = 'odom'
+        self._transform.child_frame_id = 'base_link'
+
         # Publisher
         self._publisher = node.create_publisher(Odometry, 'odom', 10)
         if self._publish_tf:
@@ -46,9 +50,17 @@ class OdomHandler:
         """Publish odometry data to ros."""
         pose = self._odom.prediction
         timestamp_message = self._node.get_clock().now().to_msg()
-        if self._publish_tf:
-            self._tf_broadcaster.sendTransform(self._pose_to_transform_stamped(pose, timestamp_message))
         quat = Quaternion(axis=[0, 0, 1], angle=pose.yaw)
+        if self._publish_tf:
+            self._transform.header.stamp = timestamp_message
+            self._transform.transform.translation.x = pose.x
+            self._transform.transform.translation.y = pose.y
+            self._transform.transform.translation.z = 0.0
+            self._transform.transform.rotation.x = quat.x
+            self._transform.transform.rotation.y = quat.y
+            self._transform.transform.rotation.z = quat.z
+            self._transform.transform.rotation.w = quat.w
+            self._tf_broadcaster.sendTransform(self._transform)
         velocity = self._odom.current_velocity
         if velocity is None:
             self.log.debug('Velocity is None, skipping publish')
@@ -64,19 +76,3 @@ class OdomHandler:
         self._odom_msg.twist.twist.linear.x = velocity.linear
         self._odom_msg.twist.twist.angular.z = velocity.angular
         self._publisher.publish(self._odom_msg)
-
-    def _pose_to_transform_stamped(self, pose: Pose, timestamp_msg) -> TransformStamped:
-        """Convert pose to transform stamped."""
-        quat = Quaternion(axis=[0, 0, 1], angle=pose.yaw)
-        transform = TransformStamped()
-        transform.header.stamp = timestamp_msg
-        transform.header.frame_id = 'odom'
-        transform.child_frame_id = 'base_link'
-        transform.transform.translation.x = pose.x
-        transform.transform.translation.y = pose.y
-        transform.transform.translation.z = 0.0
-        transform.transform.rotation.x = quat.x
-        transform.transform.rotation.y = quat.y
-        transform.transform.rotation.z = quat.z
-        transform.transform.rotation.w = quat.w
-        return transform
