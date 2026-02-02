@@ -21,7 +21,31 @@ services:
     environment:
       - ROS_DOMAIN_ID=0 # Default ROS domain
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp # Using CycloneDDS
+      - FELDFREUND_SIMULATION=true # Run in simulation mode
 
     # Source and launch the devkit system
     command: bash -c "source /opt/ros/jazzy/setup.bash && source /workspace/install/setup.bash && ros2 launch devkit_launch devkit_nocams.launch.py & tail -f /dev/null"
     restart: unless-stopped
+
+  devkit-simulation:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: devkit_ros:latest
+    # network_mode: host # Only works on Linux; commented out for macOS/Windows compatibility
+    privileged: true # Required for hardware access
+    ports:
+      - "80:80" # UI port
+      - "8765:8765" # Foxglove Bridge (if enabled)
+    volumes:
+      - ~/.ros:/root/.ros # For ROS logs
+      - ../:/workspace/src
+    environment:
+      - ROS_DOMAIN_ID=0 # Default ROS domain
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp # Using CycloneDDS
+      - FELDFREUND_SIMULATION=true # Run in simulation mode
+
+    # Source and launch the devkit system
+    command: bash -c "source /opt/ros/jazzy/setup.bash && source /workspace/install/setup.bash && ros2 launch devkit_launch devkit_simulation.launch.py"
+    restart: unless-stopped
+    
