@@ -69,6 +69,7 @@ class OdomHandler:
         """Convert pose to transform stamped."""
         quat = Quaternion(axis=[0, 0, 1], angle=pose.yaw)
         transform = TransformStamped()
+        transform.header.stamp = self._node.get_clock().now().to_msg()
         transform.header.frame_id = 'odom'
         transform.child_frame_id = 'base_link'
         transform.transform.translation.x = pose.x
