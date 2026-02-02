@@ -1,6 +1,5 @@
 import numpy as np
 import rosys
-from builtin_interfaces.msg import Time
 from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Odometry
 from pyquaternion import Quaternion
@@ -66,7 +65,7 @@ class OdomHandler:
         self._odom_msg.twist.twist.angular.z = velocity.angular
         self._publisher.publish(self._odom_msg)
 
-    def _pose_to_transform_stamped(self, pose: Pose, timestamp_msg: Time) -> TransformStamped:
+    def _pose_to_transform_stamped(self, pose: Pose, timestamp_msg) -> TransformStamped:
         """Convert pose to transform stamped."""
         quat = Quaternion(axis=[0, 0, 1], angle=pose.yaw)
         transform = TransformStamped()
