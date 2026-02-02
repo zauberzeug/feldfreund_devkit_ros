@@ -5,7 +5,6 @@ from nav_msgs.msg import Odometry
 from pyquaternion import Quaternion
 from rclpy.node import Node
 from rosys.driving import Odometer
-from rosys.geometry import Pose
 from tf2_ros import TransformBroadcaster
 
 
