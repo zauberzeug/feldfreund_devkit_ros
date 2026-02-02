@@ -1,6 +1,7 @@
 import numpy as np
 import rosys
-from geometry_msgs.msg import PoseStamped, TransformStamped
+from builtin_interfaces.msg import Time
+from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Odometry
 from pyquaternion import Quaternion
 from rclpy.node import Node
@@ -14,9 +15,8 @@ class OdomHandler:
 
     def __init__(self, node: Node, odom: Odometer):
         self.log = node.get_logger()
-        self.odom = odom
+        self._odom = odom
         self._node = node
-        self.current_pose = PoseStamped()
 
         # Read parameters
         node.declare_parameter('twist_stddev', np.zeros(36).tolist())
@@ -40,20 +40,21 @@ class OdomHandler:
         self._publisher = node.create_publisher(Odometry, 'odom', 10)
         if self._publish_tf:
             self._tf_broadcaster = TransformBroadcaster(self._node)
-        self.odom.PREDICTION_UPDATED.subscribe(self.publish_odom)
+        self._odom.PREDICTION_UPDATED.subscribe(self.publish_odom)
         rosys.on_startup(self.publish_odom)
 
     def publish_odom(self):
         """Publish odometry data to ros."""
-        pose = self.odom.prediction
+        pose = self._odom.prediction
+        timestamp_message = self._node.get_clock().now().to_msg()
         if self._publish_tf:
-            self._tf_broadcaster.sendTransform(self._pose_to_transform_stamped(pose))
+            self._tf_broadcaster.sendTransform(self._pose_to_transform_stamped(pose, timestamp_message))
         quat = Quaternion(axis=[0, 0, 1], angle=pose.yaw)
-        velocity = self.odom.current_velocity
+        velocity = self._odom.current_velocity
         if velocity is None:
             self.log.debug('Velocity is None, skipping publish')
             return
-        self._odom_msg.header.stamp = self._node.get_clock().now().to_msg()
+        self._odom_msg.header.stamp = timestamp_message
         self._odom_msg.pose.pose.position.x = pose.x
         self._odom_msg.pose.pose.position.y = pose.y
         self._odom_msg.pose.pose.position.z = 0.0
@@ -65,10 +66,11 @@ class OdomHandler:
         self._odom_msg.twist.twist.angular.z = velocity.angular
         self._publisher.publish(self._odom_msg)
 
-    def _pose_to_transform_stamped(self, pose: Pose) -> TransformStamped:
+    def _pose_to_transform_stamped(self, pose: Pose, timestamp_msg: Time) -> TransformStamped:
         """Convert pose to transform stamped."""
         quat = Quaternion(axis=[0, 0, 1], angle=pose.yaw)
         transform = TransformStamped()
+        transform.header.stamp = timestamp_msg
         transform.header.frame_id = 'odom'
         transform.child_frame_id = 'base_link'
         transform.transform.translation.x = pose.x
