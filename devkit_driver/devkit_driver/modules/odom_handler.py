@@ -34,16 +34,11 @@ class OdomHandler:
         self._odom_msg.pose.covariance = pose_cov
         self._odom_msg.twist.covariance = twist_cov
 
-        self._transform = TransformStamped()
-        self._transform.header.frame_id = 'odom'
-        self._transform.child_frame_id = 'base_link'
-
         # Publisher
         self._publisher = node.create_publisher(Odometry, 'odom', 10)
-        if self._publish_tf:
-            self._tf_broadcaster = TransformBroadcaster(self._node)
+        self._tf_broadcaster = TransformBroadcaster(self._node)
         self._odom.PREDICTION_UPDATED.subscribe(self.publish_odom)
-        rosys.on_startup(self.publish_odom)
+        self.publish_odom()
 
     def publish_odom(self):
         """Publish odometry data to ros."""
@@ -51,27 +46,30 @@ class OdomHandler:
         timestamp_message = self._node.get_clock().now().to_msg()
         quat = Quaternion(axis=[0, 0, 1], angle=pose.yaw)
         if self._publish_tf:
-            self._transform.header.stamp = timestamp_message
-            self._transform.transform.translation.x = pose.x
-            self._transform.transform.translation.y = pose.y
-            self._transform.transform.translation.z = 0.0
-            self._transform.transform.rotation.x = quat.x
-            self._transform.transform.rotation.y = quat.y
-            self._transform.transform.rotation.z = quat.z
-            self._transform.transform.rotation.w = quat.w
-            self._tf_broadcaster.sendTransform(self._transform)
+            transform_msg = TransformStamped()
+            transform_msg.header.stamp = timestamp_message
+            transform_msg.header.frame_id = 'odom'
+            transform_msg.child_frame_id = 'base_link'
+            transform_msg.transform.translation.x = float(pose.x)
+            transform_msg.transform.translation.y = float(pose.y)
+            transform_msg.transform.translation.z = 0.0
+            transform_msg.transform.rotation.x = float(quat.x)
+            transform_msg.transform.rotation.y = float(quat.y)
+            transform_msg.transform.rotation.z = float(quat.z)
+            transform_msg.transform.rotation.w = float(quat.w)
+            self._tf_broadcaster.sendTransform(transform_msg)
         velocity = self._odom.current_velocity
         if velocity is None:
             self.log.debug('Velocity is None, skipping publish')
             return
         self._odom_msg.header.stamp = timestamp_message
-        self._odom_msg.pose.pose.position.x = pose.x
-        self._odom_msg.pose.pose.position.y = pose.y
+        self._odom_msg.pose.pose.position.x = float(pose.x)
+        self._odom_msg.pose.pose.position.y = float(pose.y)
         self._odom_msg.pose.pose.position.z = 0.0
-        self._odom_msg.pose.pose.orientation.x = quat.x
-        self._odom_msg.pose.pose.orientation.y = quat.y
-        self._odom_msg.pose.pose.orientation.z = quat.z
-        self._odom_msg.pose.pose.orientation.w = quat.w
-        self._odom_msg.twist.twist.linear.x = velocity.linear
-        self._odom_msg.twist.twist.angular.z = velocity.angular
+        self._odom_msg.pose.pose.orientation.x = float(quat.x)
+        self._odom_msg.pose.pose.orientation.y = float(quat.y)
+        self._odom_msg.pose.pose.orientation.z = float(quat.z)
+        self._odom_msg.pose.pose.orientation.w = float(quat.w)
+        self._odom_msg.twist.twist.linear.x = float(velocity.linear)
+        self._odom_msg.twist.twist.angular.z = float(velocity.angular)
         self._publisher.publish(self._odom_msg)

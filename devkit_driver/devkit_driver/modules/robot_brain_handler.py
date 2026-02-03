@@ -1,4 +1,3 @@
-
 from rclpy.node import Node
 from rosys import background_tasks
 from rosys.hardware import RobotBrain
