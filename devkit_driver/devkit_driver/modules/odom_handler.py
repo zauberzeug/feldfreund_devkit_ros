@@ -1,5 +1,4 @@
 import numpy as np
-import rosys
 from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Odometry
 from pyquaternion import Quaternion

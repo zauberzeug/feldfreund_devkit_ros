@@ -1,8 +1,8 @@
 # Feldfreund DevKit ROS
 
-Feldfreund DevKit ROS is a comprehensive ROS2 package that handles the communication and configuration of various field friend components:
+Feldfreund DevKit ROS is a comprehensive ROS2 package that handles the communication and configuration of various Feldfreund components:
 
-- Communication with Lizard (ESP32) to control the Field Friend
+- Communication with Lizard (ESP32) to control the Feldfreund
 - GNSS positioning system
 - Camera systems (USB and AXIS cameras)
 - Example UI to control the robot
@@ -131,7 +131,7 @@ The system can be started using different launch files:
 
 - `devkit.launch.py`: Launches all components
 - `devkit_nocams.launch.py`: Launches all components without the cameras
-- `devkit_driver.launch.py`: Launches only Field Friend driver
+- `devkit_driver.launch.py`: Launches only Feldfreund DevKit driver
 - `camera_system.launch.py`: Launches complete camera system (USB + AXIS) and Foxglove Bridge
 - `usb_camera.launch.py`: Launches USB camera only
 - `axis_cameras.launch.py`: Launches AXIS cameras only
@@ -176,7 +176,6 @@ cd devkit_ros
 Before building, check and adjust if needed:
 
 1. **ROS2 Configuration** (`devkit_launch/config/devkit.yaml`):
-
    - Verify `serial_port` matches your setup (default: "/dev/ttyTHS0")
    - Check `flash_parameters` for your hardware (default: "-j orin --nand")
 
