@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 compose_args="-f docker/docker-compose.yml"
+dc_command="docker compose"
 
 if [ $# -eq 0 ]
 then
@@ -38,26 +39,26 @@ cmd=$1
 cmd_args=${@:2}
 case $cmd in
     u | up)
-        docker-compose $compose_args up -d $cmd_args
+        $dc_command $compose_args up -d $cmd_args
         ;;
     p | pull)
-        docker-compose $compose_args pull
+        $dc_command $compose_args pull
         ;;
     U | uppull)
-        docker-compose $compose_args pull
-        docker-compose $compose_args up -d --build $cmd_args
+        $dc_command $compose_args pull
+        $dc_command $compose_args up -d --build $cmd_args
         ;;
     d | down)
-        docker-compose $compose_args down -d $cmd_args
+        $dc_command $compose_args down -d $cmd_args
         ;;
     s | start)
-        docker-compose $compose_args start $cmd_args
+        $dc_command $compose_args start $cmd_args
         ;;
     r | restart)
-        docker-compose $compose_args restart $cmd_args
+        $dc_command $compose_args restart $cmd_args
         ;;
     h | stop)
-        docker-compose $compose_args stop $cmd_args
+        $dc_command $compose_args stop $cmd_args
         ;;
     i | install)
         echo "disabling restart for any containers which may have been configured before"
@@ -66,22 +67,22 @@ case $cmd in
         docker update --restart=always $(docker ps -q)
         ;;
     rm)
-        docker-compose $compose_args rm $cmd_args
+        $dc_command $compose_args rm $cmd_args
         ;;
     ps)
-        docker-compose $compose_args ps $cmd_args
+        $dc_command $compose_args ps $cmd_args
         ;;
     stat | stats)
         docker stats $cmd_args
         ;;
     l | log | logs)
-        docker-compose $compose_args logs -f --tail 100 $cmd_args
+        $dc_command $compose_args logs -f --tail 100 $cmd_args
         ;;
     e | exec)
-        docker-compose $compose_args exec $cmd_args
+        $dc_command $compose_args exec $cmd_args
         ;;
     a | attach)
-        docker-compose $compose_args exec $cmd_args /bin/bash
+        $dc_command $compose_args exec $cmd_args /bin/bash
         ;;
     prune)
         docker system prune

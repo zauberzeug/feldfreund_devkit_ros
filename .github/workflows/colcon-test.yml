@@ -1,0 +1,37 @@
+name: Colcon Test
+
+on:
+  pull_request:
+    branches: [caatinga-dev, robbrit/set-up-ci]
+
+jobs:
+  colcon-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: python3 manage.py build
+
+      - name: Run colcon test
+        run: |
+          docker run --rm sowbot:jazzy bash -c '
+            source /opt/ros/jazzy/setup.bash
+            source /workspace/install/setup.bash
+            cd /workspace
+            colcon test --packages-select devkit_driver devkit_launch devkit_ui \
+              --event-handlers console_direct+ \
+              --return-code-on-test-failure
+          '
+          docker run --rm sowbot:jazzy bash -c '
+            source /opt/ros/jazzy/setup.bash
+            source /workspace/install/setup.bash
+            cd /workspace
+            colcon test-result --verbose
+          '
