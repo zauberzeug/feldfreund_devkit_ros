@@ -4,13 +4,14 @@ from rosys.hardware import Bumper, EStop
 from std_msgs.msg import Bool
 
 from ..qos import SAFETY_QOS
+from .base import Handler
 
 
-class BumperHandler:
+class BumperHandler(Handler):
     """Handle the bumper states from core data."""
 
     def __init__(self, node: Node, bumper: Bumper, estop: EStop):
-        self.log = node.get_logger()
+        super().__init__(node)
         self._bumper = bumper
         self._estop = estop
 

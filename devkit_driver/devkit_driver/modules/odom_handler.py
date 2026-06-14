@@ -6,14 +6,15 @@ from rclpy.node import Node
 from rosys.driving import Odometer
 from tf2_ros import TransformBroadcaster
 
+from .base import Handler
 
-class OdomHandler:
+
+class OdomHandler(Handler):
     """Handle the odometry."""
 
     def __init__(self, node: Node, odom: Odometer):
-        self.log = node.get_logger()
+        super().__init__(node)
         self._odom = odom
-        self._node = node
 
         # Read parameters
         node.declare_parameter('twist_stddev', np.zeros(36).tolist())
@@ -35,14 +36,14 @@ class OdomHandler:
 
         # Publisher
         self._publisher = node.create_publisher(Odometry, 'odom', 10)
-        self._tf_broadcaster = TransformBroadcaster(self._node)
+        self._tf_broadcaster = TransformBroadcaster(self.node)
         self._odom.POSE_UPDATED.subscribe(self.publish_odom)
         self.publish_odom()
 
     def publish_odom(self, *_args) -> None:
         """Publish odometry data to ros."""
         pose = self._odom.pose
-        timestamp_message = self._node.get_clock().now().to_msg()
+        timestamp_message = self.node.get_clock().now().to_msg()
         quat = Quaternion(axis=[0, 0, 1], angle=pose.yaw)
         if self._publish_tf:
             transform_msg = TransformStamped()

@@ -3,12 +3,14 @@ from rosys import background_tasks
 from rosys.hardware import RobotBrain
 from std_msgs.msg import Empty
 
+from .base import Handler
 
-class RobotBrainHandler:
+
+class RobotBrainHandler(Handler):
     """Handler for the Zauberzeug Robot Brain."""
 
     def __init__(self, node: Node, robot_brain: RobotBrain):
-        self.log = node.get_logger()
+        super().__init__(node)
         self._robot_brain = robot_brain
 
         self._enable_sub = node.create_subscription(Empty, 'esp/enable', self._handle_enable, 10)
@@ -18,16 +20,16 @@ class RobotBrainHandler:
         self._configure_sub = node.create_subscription(Empty, 'esp/configure', self._handle_configure, 10)
 
     def _handle_enable(self, _: Empty) -> None:
-        background_tasks.create(self._robot_brain.enable_esp())
+        background_tasks.create(self._robot_brain.enable_esp(), name='robot_brain: enable')
 
     def _handle_disable(self, _: Empty) -> None:
-        background_tasks.create(self._robot_brain.disable_esp())
+        background_tasks.create(self._robot_brain.disable_esp(), name='robot_brain: disable')
 
     def _handle_reset(self, _: Empty) -> None:
-        background_tasks.create(self._robot_brain.reset_esp())
+        background_tasks.create(self._robot_brain.reset_esp(), name='robot_brain: reset')
 
     def _handle_restart(self, _: Empty) -> None:
-        background_tasks.create(self._robot_brain.restart())
+        background_tasks.create(self._robot_brain.restart(), name='robot_brain: restart')
 
     def _handle_configure(self, _: Empty) -> None:
-        background_tasks.create(self._robot_brain.configure())
+        background_tasks.create(self._robot_brain.configure(), name='robot_brain: configure')
