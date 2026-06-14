@@ -7,6 +7,7 @@ from pathlib import Path
 import rclpy
 import rclpy.parameter
 import rosys
+from ament_index_python.packages import get_package_share_directory
 from feldfreund_devkit import FeldfreundHardware, FeldfreundSimulation, System, api
 from feldfreund_devkit.config import Secrets, config_from_file
 from nicegui import app, ui, ui_run
@@ -57,6 +58,14 @@ class DevkitDriver(Node):
         self._clock_publisher.publish(msg)
 
 
+class _State:
+    """Module-level container for the spinning ROS thread (avoids a global statement)."""
+    ros_thread: threading.Thread | None = None
+
+
+_state = _State()
+
+
 def main() -> None:
     # NOTE: This function is defined as the ROS entry point in setup.py, but it's empty to enable NiceGUI auto-reloading
     pass
@@ -69,10 +78,19 @@ def on_startup() -> None:
         rosys.enter_simulation()
 
     secrets = Secrets()
-    config = config_from_file('/workspace/src/devkit_launch/config/feldfreund.py', secrets=secrets)
+    config = config_from_file(_config_file_path(), secrets=secrets)
     system = System(config, secrets=secrets)
     api.Online()
-    threading.Thread(target=ros_main, args=(system,)).start()
+    _state.ros_thread = threading.Thread(target=ros_main, args=(system,), name='ros_spin')
+    _state.ros_thread.start()
+
+
+def on_shutdown() -> None:
+    """Stop the ROS thread cleanly when NiceGUI shuts down."""
+    if rclpy.ok():
+        rclpy.shutdown()  # makes rclpy.spin() in the ROS thread return
+    if _state.ros_thread is not None:
+        _state.ros_thread.join(timeout=5.0)
 
 
 def ros_main(system: System) -> None:
@@ -82,8 +100,20 @@ def ros_main(system: System) -> None:
         rclpy.spin(devkit_driver)
     except ExternalShutdownException:
         pass
+    finally:
+        devkit_driver.destroy_node()
+        rclpy.try_shutdown()
+
+
+def _config_file_path() -> str:
+    """Return the devkit config file path; override with the DEVKIT_CONFIG environment variable."""
+    override = os.environ.get('DEVKIT_CONFIG')
+    if override:
+        return override
+    return os.path.join(get_package_share_directory('devkit_launch'), 'config', 'feldfreund.py')
 
 
 app.on_startup(on_startup)
+app.on_shutdown(on_shutdown)
 ui_run.APP_IMPORT_STRING = f'{__name__}:app'  # ROS2 uses a non-standard module name, so we need to specify it here
 ui.run(uvicorn_reload_dirs=str(Path(__file__).parent.resolve()), favicon='🤖')
