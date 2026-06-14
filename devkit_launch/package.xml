@@ -13,7 +13,11 @@
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>septentrio_gnss_driver</exec_depend>
   <exec_depend>devkit_driver</exec_depend>
+  <exec_depend>devkit_ui</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>foxglove_bridge</exec_depend>
+  <exec_depend>axis_camera</exec_depend>
+  <exec_depend>usb_cam</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
