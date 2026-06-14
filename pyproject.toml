@@ -93,6 +93,11 @@ ignore = [
     "PLR2004", # magic value comparison
 ]
 
+[tool.ruff.lint.per-file-ignores]
+# Launch files prepend their own directory to sys.path before importing the shared
+# launch_utils helpers, so those imports legitimately appear after a statement.
+"*.launch.py" = ["E402"]
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 # NOTE: changing default location of pytest_cache because the uvicorn file watcher somehow triggered too many reloads

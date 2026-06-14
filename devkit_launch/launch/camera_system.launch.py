@@ -1,32 +1,18 @@
-"""Launch file for the complete camera system (AXIS and USB cameras with Foxglove Bridge)."""
+"""Launch file for the complete camera system (AXIS and USB cameras)."""
 
 import os
+import sys
 
-from ament_index_python.packages import get_package_share_directory
+sys.path.insert(0, os.path.dirname(__file__))
+# pylint: disable=wrong-import-position
+
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_utils import include_launch
 
 
-def generate_launch_description():
+def generate_launch_description() -> LaunchDescription:
     """Generate launch description for the complete camera system."""
-    pkg_dir = get_package_share_directory('devkit_launch')
-
-    # Include the AXIS cameras launch file
-    axis_cameras_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_dir, 'launch', 'axis_cameras.launch.py')
-        )
-    )
-
-    # Include the USB camera launch file
-    usb_camera_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_dir, 'launch', 'usb_camera.launch.py')
-        )
-    )
-
     return LaunchDescription([
-        axis_cameras_launch,
-        usb_camera_launch,
+        include_launch('axis_cameras.launch.py'),
+        include_launch('usb_camera.launch.py'),
     ])
