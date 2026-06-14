@@ -5,7 +5,7 @@
   <version>0.0.1</version>
   <description>ROS2 setup for the Feldfreund DevKit</description>
   <maintainer email="ros@zauberzeug.com">Zauberzeug GmbH</maintainer>
-  <license>MIT License</license>
+  <license>MIT</license>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
