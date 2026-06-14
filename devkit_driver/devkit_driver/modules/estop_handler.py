@@ -5,15 +5,16 @@ from rosys.hardware import EStop, EStopHardware
 from std_msgs.msg import Bool
 
 from ..qos import SAFETY_QOS
+from .base import Handler
 
 
-class EStopHandler:
+class EStopHandler(Handler):
     """Handle the estop."""
     FRONT_ID = 'front'
     BACK_ID = 'back'
 
     def __init__(self, node: Node, estop: EStop):
-        self.log = node.get_logger()
+        super().__init__(node)
         self._estop = estop
 
         self.subscription = node.create_subscription(Bool, 'estop/soft', self.soft_estop_callback, 10)
@@ -45,6 +46,6 @@ class EStopHandler:
         elif name == self.BACK_ID:
             self.estop_back_publisher.publish(Bool(data=False))
 
-    def soft_estop_callback(self, msg: Bool):
+    def soft_estop_callback(self, msg: Bool) -> None:
         """Implement a callback for the estop."""
-        background_tasks.create(self._estop.set_soft_estop(msg.data))
+        background_tasks.create(self._estop.set_soft_estop(msg.data), name='estop: set soft estop')
