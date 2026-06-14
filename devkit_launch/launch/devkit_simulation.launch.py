@@ -1,19 +1,18 @@
-"""Main launch file for the devkit project without cameras."""
+"""Launch file for the devkit project in simulation mode (driver + UI + Foxglove)."""
 # pylint: disable=duplicate-code
 
 import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, TimerAction
+from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    """Generate launch description for the complete devkit system without cameras."""
+    """Generate launch description for the devkit system in simulation mode."""
     pkg_dir = get_package_share_directory('devkit_launch')
-
 
     # Include the devkit driver launch file
     devkit_driver_launch = IncludeLaunchDescription(
@@ -30,7 +29,7 @@ def generate_launch_description():
         )
     )
 
-    # Foxglove Bridge Node (delayed to ensure robot_description is published)
+    # Foxglove Bridge Node
     foxglove_bridge = Node(
         package='foxglove_bridge',
         executable='foxglove_bridge',
