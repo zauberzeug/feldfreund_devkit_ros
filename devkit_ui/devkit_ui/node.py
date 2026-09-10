@@ -5,7 +5,7 @@ from gps_msgs.msg import GPSFix
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, Duration, LivelinessPolicy, QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import BatteryState
-from std_msgs.msg import Bool, Empty
+from std_msgs.msg import Bool, Empty, Float64
 
 from .dashboard import Dashboard
 
@@ -36,6 +36,11 @@ class NiceGuiNode(Node):
         self.esp_restart_publisher = self.create_publisher(Empty, 'esp/restart', 1)
         self.esp_configure_publisher = self.create_publisher(Empty, 'esp/configure', 1)
         self.estop_publisher = self.create_publisher(Bool, 'estop/soft', SAFETY_QOS)
+        self.weeding_screw_home_publisher = self.create_publisher(Empty, 'weeding_screw/home', 1)
+        self.weeding_screw_clear_view_publisher = self.create_publisher(Empty, 'weeding_screw/clear_view', 1)
+        self.weeding_screw_stop_publisher = self.create_publisher(Empty, 'weeding_screw/stop', 1)
+        self.weeding_screw_punch_publisher = self.create_publisher(Float64, 'weeding_screw/punch', 1)
+        self.weeding_screw_set_drill_depth_publisher = self.create_publisher(Float64, 'weeding_screw/set_drill_depth', 1)
 
         self.create_subscription(GPSFix, 'gpsfix', self.store_gps, 1)
         self.create_subscription(BatteryState, 'battery_state', self.store_battery, 1)
@@ -44,6 +49,11 @@ class NiceGuiNode(Node):
         self.create_subscription(Bool, 'bumper/back', self.update_bumper_back, SAFETY_QOS)
         self.create_subscription(Bool, 'estop/front', self.update_estop_front, SAFETY_QOS)
         self.create_subscription(Bool, 'estop/back', self.update_estop_back, SAFETY_QOS)
+        self.create_subscription(Float64, 'weeding_screw/y_position', self.update_weeding_screw_y_position, 1)
+        self.create_subscription(Float64, 'weeding_screw/z_position', self.update_weeding_screw_z_position, 1)
+        self.create_subscription(Bool, 'weeding_screw/is_referenced', self.update_weeding_screw_is_referenced, SAFETY_QOS)
+        self.create_subscription(Bool, 'weeding_screw/alarm', self.update_weeding_screw_alarm, SAFETY_QOS)
+        self.create_subscription(Float64, 'weeding_screw/drill_depth', self.update_weeding_screw_drill_depth, 1)
 
         # State polled by the dashboard cards (written from the ROS subscription callbacks).
         self.bumper_front_top_active = False
@@ -56,6 +66,11 @@ class NiceGuiNode(Node):
         self.angular_velocity = 0.0
         self.latest_gps: GPSFix | None = None
         self.latest_battery: BatteryState | None = None
+        self.weeding_screw_y_position = 0.0
+        self.weeding_screw_z_position = 0.0
+        self.weeding_screw_is_referenced = False
+        self.weeding_screw_alarm = False
+        self.weeding_screw_drill_depth = 0.14  # updated once the driver reports the actual value
 
         self._dashboard = Dashboard(self)
 
@@ -99,3 +114,18 @@ class NiceGuiNode(Node):
 
     def update_estop_back(self, msg: Bool) -> None:
         self.estop_back_active = msg.data
+
+    def update_weeding_screw_y_position(self, msg: Float64) -> None:
+        self.weeding_screw_y_position = msg.data
+
+    def update_weeding_screw_z_position(self, msg: Float64) -> None:
+        self.weeding_screw_z_position = msg.data
+
+    def update_weeding_screw_is_referenced(self, msg: Bool) -> None:
+        self.weeding_screw_is_referenced = msg.data
+
+    def update_weeding_screw_alarm(self, msg: Bool) -> None:
+        self.weeding_screw_alarm = msg.data
+
+    def update_weeding_screw_drill_depth(self, msg: Float64) -> None:
+        self.weeding_screw_drill_depth = msg.data

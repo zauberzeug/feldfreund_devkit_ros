@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from nicegui import ui
-from std_msgs.msg import Empty
+from std_msgs.msg import Empty, Float64
 
 if TYPE_CHECKING:
     from .node import NiceGuiNode
@@ -35,12 +35,14 @@ class Dashboard:
             self._data_card()
             self._safety_card()
         self._esp_card()
+        self._weeding_screw_card()
         self._gps_card()
         # NiceGUI has no auto-refresh, so poll the data-driven parts on a timer. The
         # joystick lives in the (non-refreshed) control card so dragging is never interrupted.
         ui.timer(UI_REFRESH_INTERVAL, self._estop_button.refresh)
         ui.timer(UI_REFRESH_INTERVAL, self._data_card.refresh)
         ui.timer(UI_REFRESH_INTERVAL, self._safety_card.refresh)
+        ui.timer(UI_REFRESH_INTERVAL, self._weeding_screw_status.refresh)
 
     def _control_card(self) -> None:
         node = self._node
@@ -109,6 +111,42 @@ class Dashboard:
                           on_click=lambda: node.esp_restart_publisher.publish(Empty())).classes('w-24')
                 ui.button('Configure', color='purple',
                           on_click=lambda: node.esp_configure_publisher.publish(Empty())).classes('w-24')
+
+    def _weeding_screw_card(self) -> None:
+        node = self._node
+        with ui.card().classes('w-[48rem] items-center mt-3'):
+            ui.label('Weeding Screw').classes('text-2xl')
+            with ui.row().classes('gap-4'):
+                ui.button('Home', color='blue',
+                          on_click=lambda: node.weeding_screw_home_publisher.publish(Empty())).classes('w-28')
+                ui.button('Clear View', color='blue',
+                          on_click=lambda: node.weeding_screw_clear_view_publisher.publish(Empty())).classes('w-28')
+                ui.button('Stop', color='red',
+                          on_click=lambda: node.weeding_screw_stop_publisher.publish(Empty())).classes('w-28')
+            with ui.row().classes('items-center gap-2 mt-3'):
+                y_input = ui.number('Y-offset', value=0.0, step=0.005, format='%.3f') \
+                    .props('dense outlined suffix=m').classes('w-32')
+                ui.button('Punch', color='purple',
+                          on_click=lambda: node.weeding_screw_punch_publisher.publish(Float64(data=y_input.value))) \
+                    .classes('w-24')
+            with ui.row().classes('items-center gap-2 mt-2'):
+                depth_input = ui.number('Drill depth', value=0.14, step=0.01, format='%.2f') \
+                    .props('dense outlined suffix=m').classes('w-32')
+                ui.button('Set Depth', color='teal',
+                          on_click=lambda: node.weeding_screw_set_drill_depth_publisher.publish(
+                              Float64(data=depth_input.value))) \
+                    .classes('w-28')
+            self._weeding_screw_status()
+
+    @ui.refreshable_method
+    def _weeding_screw_status(self) -> None:
+        node = self._node
+        with ui.row().classes('gap-6 mt-2'):
+            self._status_label('Referenced', node.weeding_screw_is_referenced)
+            self._status_label('Alarm', node.weeding_screw_alarm)
+            ui.label(f'Y: {node.weeding_screw_y_position:.3f} m').classes('text-sm')
+            ui.label(f'Z: {node.weeding_screw_z_position:.3f} m').classes('text-sm')
+            ui.label(f'Depth: {node.weeding_screw_drill_depth:.3f} m').classes('text-sm')
 
     def _gps_card(self) -> None:
         with ui.card().classes('w-[48rem] items-center mt-3'):
