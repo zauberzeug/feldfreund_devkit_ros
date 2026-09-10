@@ -23,5 +23,6 @@ def test_all_handler_modules_import() -> None:
         modules.OdomHandler,
         modules.RobotBrainHandler,
         modules.TwistHandler,
+        modules.WeedingScrewHandler,
     )
     assert all(handler is not None for handler in handlers)
