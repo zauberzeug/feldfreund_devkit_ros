@@ -16,7 +16,16 @@ from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rosgraph_msgs.msg import Clock
 
-from devkit_driver.modules import BMSHandler, BumperHandler, EStopHandler, OdomHandler, RobotBrainHandler, TwistHandler
+from devkit_driver.modules import (
+    BMSHandler,
+    BumperHandler,
+    EStopHandler,
+    OdomHandler,
+    RobotBrainHandler,
+    TwistHandler,
+    WeedingScrewHandler,
+)
+from devkit_driver.weeding_screw import WeedingScrew, WeedingScrewConfiguration
 
 
 class DevkitDriver(Node):
@@ -47,6 +56,8 @@ class DevkitDriver(Node):
             self._bumper_handler = BumperHandler(self, self.system.feldfreund.bumper, self.system.feldfreund.estop)
         self._twist_handler = TwistHandler(self, self.system.feldfreund.wheels)
         self._estop_handler = EStopHandler(self, self.system.feldfreund.estop)
+        if isinstance(self.system.feldfreund.implement, WeedingScrew):
+            self._weeding_screw_handler = WeedingScrewHandler(self, self.system.feldfreund.implement)
 
     def _publish_clock(self) -> None:
         """Publish RoSys simulation time to ROS2 /clock topic."""
@@ -84,6 +95,8 @@ def on_startup() -> None:
     secrets = Secrets()
     config = config_from_file(_config_file_path(), secrets=secrets)
     system = System(config, secrets=secrets)
+    if isinstance(config.implement, WeedingScrewConfiguration):
+        system.feldfreund.add_implement(WeedingScrew(config.implement, system.feldfreund))
     api.Online()
     _state.ros_thread = threading.Thread(target=ros_main, args=(system,), name='ros_spin')
     _state.ros_thread.start()
