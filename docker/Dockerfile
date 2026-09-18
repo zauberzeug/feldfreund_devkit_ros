@@ -15,6 +15,11 @@ RUN apt-get update && apt-get install -y \
         ros-jazzy-image-tools \
         ros-jazzy-compressed-image-transport \
         ros-jazzy-axis-camera \
+        ros-jazzy-ros2-control \
+        ros-jazzy-ros2-controllers \
+        ros-jazzy-controller-manager \
+        ros-jazzy-joint-state-topic-hardware-interface \
+        ros-jazzy-robot-state-publisher \
         python3-pip \
         python3-serial \
         python3-requests \
@@ -52,11 +57,13 @@ RUN cat /tmp/bashrc >> /root/.bashrc && rm -f /tmp/bashrc
 COPY ./devkit_driver /workspace/src/devkit_driver
 COPY ./devkit_launch /workspace/src/devkit_launch
 COPY ./devkit_ui /workspace/src/devkit_ui
+COPY ./devkit_description /workspace/src/devkit_description
+COPY ./devkit_implement_automation /workspace/src/devkit_implement_automation
 
 # Build ROS packages
 WORKDIR /workspace
 RUN . /opt/ros/jazzy/setup.sh && \
-    colcon build --packages-select devkit_driver devkit_launch devkit_ui --symlink-install && \
+    colcon build --packages-select devkit_driver devkit_launch devkit_ui devkit_description devkit_implement_automation --symlink-install && \
     . install/setup.sh
 
 WORKDIR /workspace

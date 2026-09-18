@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+  Minimal robot description for the Feldfreund DevKit's ros2_control stack.
+
+  Only hosts the <ros2_control> blocks the controller_manager needs (no visual/collision meshes,
+  no full kinematic chain) - the devkit has no other ros2_control-driven hardware yet. Each
+  implement gets its own <name>.ros2_control.xacro macro file, included and instantiated here, so
+  adding another implement later is a matter of writing one more such file, not touching this one.
+-->
+<robot name="devkit" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:arg name="y_min" default="-0.12"/>
+  <xacro:arg name="y_max" default="0.12"/>
+  <xacro:arg name="z_min" default="-0.2"/>
+  <xacro:arg name="z_max" default="0.0"/>
+  <xacro:arg name="max_velocity" default="0.2"/>
+  <xacro:arg name="joint_commands_topic" default="/weeding_screw/joint_commands"/>
+  <xacro:arg name="joint_states_topic" default="/weeding_screw/joint_states"/>
+
+  <link name="base_link"/>
+
+  <xacro:include filename="$(find devkit_description)/urdf/weeding_screw.ros2_control.xacro"/>
+  <xacro:weeding_screw_ros2_control parent="base_link"
+                                    y_min="$(arg y_min)" y_max="$(arg y_max)"
+                                    z_min="$(arg z_min)" z_max="$(arg z_max)"
+                                    max_velocity="$(arg max_velocity)"
+                                    joint_commands_topic="$(arg joint_commands_topic)"
+                                    joint_states_topic="$(arg joint_states_topic)"/>
+
+</robot>

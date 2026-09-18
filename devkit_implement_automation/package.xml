@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>devkit_implement_automation</name>
+  <version>0.1.0</version>
+  <description>
+    Task-level automations for devkit implements (e.g. the weeding screw's home/punch/clear-view),
+    built purely on standard ROS/ros2_control interfaces (topics, ros2_control controllers) - no
+    rosys or Lizard dependency, so it stays reusable as further implements and automations
+    (eventually including navigation) are added.
+  </description>
+  <maintainer email="ros@zauberzeug.com">Zauberzeug GmbH</maintainer>
+  <license>MIT</license>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>devkit_driver</exec_depend> <!-- only for the shared SAFETY_QOS profile (pure rclpy, no rosys) -->
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

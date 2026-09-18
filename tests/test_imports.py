@@ -7,6 +7,7 @@ the ROS message packages), so these run in the ``ros-tests`` CI job, not the pip
 """
 
 from devkit_driver.qos import SAFETY_QOS
+from devkit_implement_automation.weeding_screw_automation import WeedingScrewAutomation
 
 from devkit_driver import modules
 
@@ -23,5 +24,10 @@ def test_all_handler_modules_import() -> None:
         modules.OdomHandler,
         modules.RobotBrainHandler,
         modules.TwistHandler,
+        modules.WeedingScrewHandler,
     )
     assert all(handler is not None for handler in handlers)
+
+
+def test_weeding_screw_automation_node_imports() -> None:
+    assert WeedingScrewAutomation is not None
