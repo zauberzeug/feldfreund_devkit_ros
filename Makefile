@@ -21,21 +21,21 @@ install-ci:
 
 ## mypy		Run mypy type checks.
 mypy:
-	mypy ./devkit_driver ./devkit_launch ./devkit_ui --exclude 'setup\.py$$' --non-interactive --install-types
+	mypy ./devkit_driver ./devkit_launch ./devkit_ui ./devkit_implement_automation --exclude 'setup\.py$$' --non-interactive --install-types
 
 ## pylint		Run pylint code analysis.
 pylint:
-	pylint ./devkit_driver/devkit_driver ./devkit_launch/launch ./devkit_ui/devkit_ui
+	pylint ./devkit_driver/devkit_driver ./devkit_launch/launch ./devkit_ui/devkit_ui ./devkit_implement_automation/devkit_implement_automation
 
 ## ruff		Run ruff code analysis.
 ruff:
-	ruff check ./devkit_driver/devkit_driver ./devkit_launch/launch ./devkit_ui/devkit_ui
+	ruff check ./devkit_driver/devkit_driver ./devkit_launch/launch ./devkit_ui/devkit_ui ./devkit_implement_automation/devkit_implement_automation
 
 ## test		Run the pytest suite (requires a sourced ROS environment).
 # NOTE: the ROS launch_testing pytest plugins are incompatible with modern pytest, so we
 # disable plugin autoloading and explicitly load only pytest-asyncio (for asyncio_mode).
 test:
-	PYTHONPATH=$(CURDIR)/devkit_driver:$(CURDIR)/devkit_ui:$$PYTHONPATH \
+	PYTHONPATH=$(CURDIR)/devkit_driver:$(CURDIR)/devkit_ui:$(CURDIR)/devkit_implement_automation:$$PYTHONPATH \
 	PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest -p pytest_asyncio.plugin
 
 ## pre-commit	Run pre-commit hooks on all files.

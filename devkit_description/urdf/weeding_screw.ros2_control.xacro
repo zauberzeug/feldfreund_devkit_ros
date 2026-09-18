@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!--
+    Reusable ros2_control block for the weeding screw's Y-/Z-axis punch tool.
+
+    Bridges to the real hardware via the generic, ros-controls-maintained
+    joint_state_topic_hardware_interface plugin (https://github.com/ros-controls/topic_based_hardware_interfaces)
+    instead of a custom hardware_interface plugin: it relays controller_manager's read()/write()
+    cycle to plain sensor_msgs/JointState topics, so the actual Y-/Z-axis motion stays implemented
+    in Python (devkit_driver's WeedingScrewHandler), talking to the Lizard-firmware-based CANopen
+    axes exactly as before - this xacro only adds the standard ros2_control joint/controller layer
+    on top, it does not change how the axes are actually driven or how the drive-lock safety
+    interlock works (that stays entirely in Lizard firmware).
+
+    Every parameter below defaults to a generic placeholder, not f18's real axis range - matching
+    this repo's usual split of "generic upstream, real per-robot numbers stay in local launch
+    arguments" (see devkit_launch/launch/devkit_control.launch.py).
+  -->
+  <xacro:macro name="weeding_screw_ros2_control"
+               params="parent
+                       y_min:=-0.12 y_max:=0.12
+                       z_min:=-0.2 z_max:=0.0
+                       max_velocity:=0.2
+                       joint_commands_topic:=/weeding_screw/joint_commands
+                       joint_states_topic:=/weeding_screw/joint_states">
+
+    <link name="weeding_screw_y_link"/>
+    <link name="weeding_screw_z_link"/>
+
+    <joint name="weeding_screw_y_joint" type="prismatic">
+      <parent link="${parent}"/>
+      <child link="weeding_screw_y_link"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="${y_min}" upper="${y_max}" effort="0" velocity="${max_velocity}"/>
+    </joint>
+
+    <joint name="weeding_screw_z_joint" type="prismatic">
+      <parent link="weeding_screw_y_link"/>
+      <child link="weeding_screw_z_link"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${z_min}" upper="${z_max}" effort="0" velocity="${max_velocity}"/>
+    </joint>
+
+    <ros2_control name="weeding_screw" type="system">
+      <hardware>
+        <plugin>joint_state_topic_hardware_interface/JointStateTopicSystem</plugin>
+        <param name="joint_commands_topic">${joint_commands_topic}</param>
+        <param name="joint_states_topic">${joint_states_topic}</param>
+        <!-- weeding_screw_position_controller now stays active permanently and republishes the
+             current position as a hold command whenever idle (see WeedingScrewAutomation._tick()).
+             Left at the plugin's tiny 1e-5 default, that heartbeat's inherent round-trip jitter
+             against the real measured position keeps exceeding it, so the plugin kept forwarding
+             near-identical "moves" to devkit_driver's WeedingScrewHandler - each one re-enabling a
+             just-disabled motor (see move_to()'s ctrl_enable recovery) and undoing a stop/e-stop.
+             0.002 matches devkit_implement_automation's own position_tolerance - a real step target
+             is never that close to the current position by definition, so genuine moves still
+             publish normally; only the idle heartbeat's noise is suppressed. -->
+        <param name="trigger_joint_command_threshold">0.002</param>
+      </hardware>
+      <joint name="weeding_screw_y_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+      </joint>
+      <joint name="weeding_screw_z_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+      </joint>
+    </ros2_control>
+
+  </xacro:macro>
+</robot>

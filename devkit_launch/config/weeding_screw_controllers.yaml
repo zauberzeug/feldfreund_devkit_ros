@@ -1,0 +1,17 @@
+# Controller-manager-independent controller config: each controller declares its own `type` under
+# its own top-level key, loaded per-controller via `spawner --param-file` (not given to
+# ros2_control_node itself) - this matches the current ros2_control_demos convention (checked
+# against both the jazzy and rolling branches), not the older "controller_manager: ros__parameters:
+# <name>: type: ..." nesting still shown in some tutorials.
+
+joint_state_broadcaster:
+  ros__parameters:
+    type: joint_state_broadcaster/JointStateBroadcaster
+
+weeding_screw_position_controller:
+  ros__parameters:
+    type: forward_command_controller/ForwardCommandController
+    joints:
+      - weeding_screw_y_joint
+      - weeding_screw_z_joint
+    interface_name: position

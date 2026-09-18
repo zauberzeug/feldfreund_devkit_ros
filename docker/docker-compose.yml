@@ -53,3 +53,27 @@ services:
     # Source and launch the devkit system
     command: bash -c "source /opt/ros/jazzy/setup.bash && source /workspace/install/setup.bash && ros2 launch devkit_launch devkit_simulation.launch.py"
     restart: unless-stopped
+
+  # Experimental ros2_control stack for the weeding screw (robot_state_publisher, controller_manager,
+  # controllers) - not yet part of the `devkit` service; runs alongside it as its own service so the
+  # existing hardware stack is unaffected while this is evaluated. Talks to `devkit`'s
+  # WeedingScrewHandler purely over the /weeding_screw/joint_commands + /weeding_screw/joint_states
+  # topics, so `network_mode: host` (shared with `devkit`) is enough - no volume/device access needed.
+  devkit-control:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: devkit_ros:latest
+    network_mode: host # Required for ROS2 communication with the `devkit` service
+    volumes:
+      - ~/.ros:/root/.ros # For ROS logs
+      - ../:/workspace/src
+    environment:
+      - ROS_DOMAIN_ID=0 # Default ROS domain
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp # Using CycloneDDS
+
+    # Source and launch the ros2_control stack; override y_min/y_max/z_min/z_max/max_velocity here
+    # (or in a robot-specific compose override) with the real axis config instead of the generic
+    # placeholder defaults.
+    command: bash -c "source /opt/ros/jazzy/setup.bash && source /workspace/install/setup.bash && ros2 launch devkit_launch devkit_control.launch.py"
+    restart: unless-stopped
