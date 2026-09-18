@@ -100,7 +100,11 @@ class ZAxisCanOpenHardware(Axis, rosys.hardware.ModuleHardware, SafetyMixin):
         try:
             await super().move_to(position, speed)
         except RuntimeError as error:
-            self._raise_exception(f'could not move to {position} because of {error}')
+            # A rejected request (out of range, not referenced yet, speed too high) never reached
+            # the hardware - it says nothing about whether the axis is still actually referenced,
+            # so don't lose_reference=True here. An alarm specifically is still covered: it's
+            # tracked from live core telemetry in handle_core_output(), independent of this check.
+            self._raise_exception(f'could not move to {position} because of {error}', lose_reference=False)
         try:
             steps = self.compute_steps(position)
             assert self.robot_brain.is_ready, 'robot brain is not ready'
@@ -247,8 +251,9 @@ class ZAxisCanOpenHardware(Axis, rosys.hardware.ModuleHardware, SafetyMixin):
         if not self.ctrl_enable:
             self._raise_exception('is not enabled')
 
-    def _raise_exception(self, message: str) -> None:
-        self.is_referenced = False
+    def _raise_exception(self, message: str, *, lose_reference: bool = True) -> None:
+        if lose_reference:
+            self.is_referenced = False
         self.log.error('%s %s', self.config.name, message)
         raise CanOpenHardwareException(f'{self.config.name}: {message}')
 

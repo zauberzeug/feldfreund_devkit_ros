@@ -111,12 +111,6 @@ class Axis(rosys.hardware.Module, abc.ABC):
     def position(self) -> float:
         return self.compute_position(self.steps)
 
-    async def return_to_reference(self) -> None:
-        try:
-            await self.move_to(0)
-        except RuntimeError as e:
-            self.log.error('could not return axis to reference because of %s', e)
-
 
 class AxisSimulation(Axis, rosys.hardware.ModuleSimulation):
     """A simple simulated axis, for exercising the ROS wiring without hardware."""
