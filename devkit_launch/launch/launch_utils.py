@@ -22,6 +22,8 @@ PACKAGE = 'devkit_launch'
 
 # Default network ports
 FOXGLOVE_BRIDGE_PORT = 8765
+# NOTE: a small buffer makes the bridge drop stale frames on a slow link instead of queueing seconds of video
+FOXGLOVE_SEND_BUFFER_LIMIT = 1_000_000
 
 
 def config_path(file_name: str, package: str = PACKAGE) -> str:
@@ -45,8 +47,7 @@ def foxglove_bridge(port: int = FOXGLOVE_BRIDGE_PORT) -> Node:
             'port': port,
             'address': '0.0.0.0',  # NOTE: allow connections from the operator's machine on the robot network
             'tls': False,
-            'compression': 'jpeg',  # compress images for remote viewing
-            'jpeg_quality': 75,
             'max_qos_depth': 10,
+            'send_buffer_limit': FOXGLOVE_SEND_BUFFER_LIMIT,
         }],
     )
