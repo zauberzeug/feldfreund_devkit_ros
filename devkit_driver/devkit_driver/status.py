@@ -1,11 +1,17 @@
 """Robot status endpoint polled by the fleet dashboard."""
 
+from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 
 import feldfreund_devkit
 import rosys
 from feldfreund_devkit import Feldfreund, FeldfreundHardware, System
 from nicegui import app
+
+try:
+    DRIVER_VERSION = version('devkit_driver')
+except PackageNotFoundError:
+    DRIVER_VERSION = 'unknown'
 
 
 def register_status_route(system: System) -> None:
@@ -66,7 +72,10 @@ def _position(feldfreund: Feldfreund) -> dict[str, float] | None:
 
 
 def _versions(feldfreund: Feldfreund) -> dict[str, str]:
-    versions = {'feldfreund_devkit': feldfreund_devkit.__version__, 'rosys': rosys.__version__}
+    # NOTE: the dashboard shows 'feldfreund' as the application version, so it names the ROS stack there
+    versions = {'feldfreund': f'ros {DRIVER_VERSION}',
+                'feldfreund_devkit': feldfreund_devkit.__version__,
+                'rosys': rosys.__version__}
     if not isinstance(feldfreund, FeldfreundHardware):
         return {**versions, 'lizard_core': 'simulation', 'lizard_p0': 'simulation'}
     lizard_firmware = feldfreund.robot_brain.lizard_firmware

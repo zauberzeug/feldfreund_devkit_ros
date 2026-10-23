@@ -4,7 +4,7 @@ from pathlib import Path
 import feldfreund_devkit
 import pytest
 import rosys
-from devkit_driver.status import collect_status
+from devkit_driver.status import DRIVER_VERSION, collect_status
 from feldfreund_devkit import System
 from feldfreund_devkit.config import FeldfreundConfiguration, GnssConfiguration, Secrets, config_from_file
 from rosys.geometry import GeoReference
@@ -49,6 +49,7 @@ async def test_idle_robot_without_gnss(system: System) -> None:
         'position': None,
         'maintenance_mode': None,
         'versions': {
+            'feldfreund': f'ros {DRIVER_VERSION}',
             'feldfreund_devkit': feldfreund_devkit.__version__,
             'rosys': rosys.__version__,
             'lizard_core': 'simulation',
