@@ -4,7 +4,7 @@ version = "0.1.0-dev"
 description = "ROS2 nodes for the Feldfreund DevKit"
 authors = [{ name="Zauberzeug GmbH", email="info@zauberzeug.com" }]
 readme = "README.md"
-requires-python = ">=3.11, <3.14"
+requires-python = ">=3.12, <3.14"
 
 [dependency-groups]
 dev = [
@@ -12,7 +12,7 @@ dev = [
 ]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 check_untyped_defs = true
 
 [[tool.mypy.overrides]]
@@ -76,7 +76,7 @@ ignored-modules = [
 [tool.ruff]
 line-length = 120
 indent-width = 4
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = [
