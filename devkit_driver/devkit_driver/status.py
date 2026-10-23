@@ -65,11 +65,11 @@ def _position(feldfreund: Feldfreund) -> dict[str, float] | None:
     return {'lat': latitude, 'lon': longitude}
 
 
-def _versions(feldfreund: Feldfreund) -> dict[str, str | None]:
-    lizard_firmware = feldfreund.robot_brain.lizard_firmware if isinstance(feldfreund, FeldfreundHardware) else None
-    return {
-        'feldfreund_devkit': feldfreund_devkit.__version__,
-        'rosys': rosys.__version__,
-        'lizard_core': lizard_firmware.core_version if lizard_firmware is not None else None,
-        'lizard_p0': lizard_firmware.p0_version if lizard_firmware is not None else None,
-    }
+def _versions(feldfreund: Feldfreund) -> dict[str, str]:
+    versions = {'feldfreund_devkit': feldfreund_devkit.__version__, 'rosys': rosys.__version__}
+    if not isinstance(feldfreund, FeldfreundHardware):
+        return {**versions, 'lizard_core': 'simulation', 'lizard_p0': 'simulation'}
+    lizard_firmware = feldfreund.robot_brain.lizard_firmware
+    return {**versions,
+            'lizard_core': lizard_firmware.core_version or 'unknown',
+            'lizard_p0': lizard_firmware.p0_version or 'unknown'}

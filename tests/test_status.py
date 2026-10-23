@@ -51,8 +51,8 @@ async def test_idle_robot_without_gnss(system: System) -> None:
         'versions': {
             'feldfreund_devkit': feldfreund_devkit.__version__,
             'rosys': rosys.__version__,
-            'lizard_core': None,
-            'lizard_p0': None,
+            'lizard_core': 'simulation',
+            'lizard_p0': 'simulation',
         },
     }
 
