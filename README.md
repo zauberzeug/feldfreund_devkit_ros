@@ -43,6 +43,11 @@ Subscribed topics (ROS → driver):
 - `/esp/restart` (std_msgs/Empty): Restart the robot brain (hardware mode)
 - `/esp/configure` (std_msgs/Empty): Send the Lizard configuration to the robot brain (hardware mode)
 
+HTTP API (served by the driver on port 8080 and forwarded by the UI on port 80):
+
+- `GET /api/online`: Answers `{"online": true}` while the driver is running
+- `GET /api/status`: Robot status for fleet monitoring: work status (`idle`, `working`, `emergency stop` or `bumper active`), battery, GNSS position (`null` without a configured GNSS) and software versions
+
 ### Camera System
 
 The camera system supports both USB cameras and AXIS cameras, managed through a unified launch system in `camera_system.launch.py` that handles USB cameras, AXIS cameras, and the Foxglove Bridge for remote viewing.
@@ -63,6 +68,7 @@ The GNSS system uses the [Septentrio GNSS driver](https://github.com/septentrio-
 - `/atteuler`: Attitude in Euler angles
 - `/attcoveuler`: Attitude covariance
 - `/gpsfix`: Detailed GPS fix information including satellites and quality
+- `/navsatfix` (sensor_msgs/NavSatFix): Standard fix message, e.g. for the Foxglove map panel
 - `/aimplusstatus`: AIM+ status information
 
 ### DevKit UI
@@ -75,6 +81,7 @@ The example UI provides a robot control interface built with NiceGUI, featuring 
 - Software emergency stop control
 
 The interface is accessible through a web browser at `http://<ROBOT-IP>:80` when the robot is running.
+It forwards `GET /api/...` requests to the driver's HTTP API and answers 503 while the driver is unreachable.
 
 <div align="center">
   <img src="assets/DevKitUI.png" alt="Example UI Screenshot" width="500"/>
@@ -156,7 +163,9 @@ ros2 launch devkit_launch devkit.launch.py
 
 ## AXIS Camera Authentication
 
-The AXIS cameras can be configured to use either digest or basic authentication. To check and configure the authentication mode:
+The AXIS cameras can be configured to use either digest or basic authentication.
+The driver uses basic authentication by default; for a camera that requires digest, set `use_encrypted_password: true` in `config/axis_camera.yaml`.
+To check or change the camera's authentication mode instead:
 
 1. Check current authentication settings:
 
