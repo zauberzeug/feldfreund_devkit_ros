@@ -24,7 +24,7 @@ Configuration:
 
 Published topics (driver → ROS):
 
-- `/odom` (nav_msgs/Odometry): Robot odometry data
+- `/odom` (nav_msgs/Odometry): Robot odometry, published with every wheel velocity measurement, also at standstill
 - `/battery_state` (sensor_msgs/BatteryState): Battery status information
 - `/bumper/front_top` (std_msgs/Bool): Front top bumper state
 - `/bumper/front_bottom` (std_msgs/Bool): Front bottom bumper state
