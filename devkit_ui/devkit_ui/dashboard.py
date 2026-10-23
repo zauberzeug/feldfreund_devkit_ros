@@ -12,6 +12,7 @@ DEFAULT_MAP_CENTER = (51.98278, 7.43440)  # Zauberzeug HQ, Münster
 MAP_ZOOM = 16
 GPS_UPDATE_INTERVAL = 2.0  # seconds
 UI_REFRESH_INTERVAL = 0.5  # seconds
+CMD_VEL_REPEAT_INTERVAL = 0.2  # seconds
 
 
 class Dashboard:
@@ -46,9 +47,21 @@ class Dashboard:
         node = self._node
         with ui.card().classes('flex-1 text-center items-center'):
             ui.label('Control').classes('text-2xl')
+            command = [0.0, 0.0]
+
+            def steer(x: float, y: float) -> None:
+                command[:] = [x, y]
+                node.send_speed(x, y)
+
+            def repeat_command() -> None:
+                if any(command):
+                    node.send_speed(*command)
+
             ui.joystick(color='blue', size=50,
-                        on_move=lambda e: node.send_speed(float(e.y), float(e.x)),
-                        on_end=lambda _: node.send_speed(0.0, 0.0))
+                        on_move=lambda e: steer(float(e.y), float(e.x)),
+                        on_end=lambda _: steer(0.0, 0.0))
+            # NOTE: the joystick only reports movement, but the driver stops when cmd_vel pauses for its timeout
+            ui.timer(CMD_VEL_REPEAT_INTERVAL, repeat_command)
             ui.label('Publish steering commands by dragging your mouse around in the blue field').classes('mt-6')
             self._estop_button()
 
