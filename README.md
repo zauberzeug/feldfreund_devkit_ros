@@ -43,6 +43,11 @@ Subscribed topics (ROS → driver):
 - `/esp/restart` (std_msgs/Empty): Restart the robot brain (hardware mode)
 - `/esp/configure` (std_msgs/Empty): Send the Lizard configuration to the robot brain (hardware mode)
 
+HTTP API (served by the driver on port 8080 and forwarded by the UI on port 80):
+
+- `GET /api/online`: Answers `{"online": true}` while the driver is running
+- `GET /api/status`: Robot status for fleet monitoring: work status (`idle`, `working`, `emergency stop` or `bumper active`), battery, GNSS position (`null` without a configured GNSS) and software versions
+
 ### Camera System
 
 The camera system supports both USB cameras and AXIS cameras, managed through a unified launch system in `camera_system.launch.py` that handles USB cameras, AXIS cameras, and the Foxglove Bridge for remote viewing.
@@ -76,6 +81,7 @@ The example UI provides a robot control interface built with NiceGUI, featuring 
 - Software emergency stop control
 
 The interface is accessible through a web browser at `http://<ROBOT-IP>:80` when the robot is running.
+It forwards `GET /api/...` requests to the driver's HTTP API and answers 503 while the driver is unreachable.
 
 <div align="center">
   <img src="assets/DevKitUI.png" alt="Example UI Screenshot" width="500"/>

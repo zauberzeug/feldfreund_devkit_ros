@@ -7,6 +7,7 @@ import rclpy
 from nicegui import app, ui, ui_run
 from rclpy.executors import ExternalShutdownException
 
+from .driver_api import forward_to_driver
 from .node import NiceGuiNode
 
 UI_PORT = 80
@@ -27,6 +28,7 @@ def main() -> None:
 
 # pylint: disable=duplicate-code  # same NiceGUI thread boilerplate as devkit_driver_node; not worth a shared package
 def on_startup() -> None:
+    app.get('/api/{path:path}')(forward_to_driver)
     _state.ros_thread = threading.Thread(target=ros_main, name='ros_spin')
     _state.ros_thread.start()
 

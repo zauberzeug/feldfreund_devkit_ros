@@ -33,10 +33,10 @@ ruff:
 
 ## test		Run the pytest suite (requires a sourced ROS environment).
 # NOTE: the ROS launch_testing pytest plugins are incompatible with modern pytest, so we
-# disable plugin autoloading and explicitly load only pytest-asyncio (for asyncio_mode).
+# disable plugin autoloading and explicitly load pytest-asyncio (for asyncio_mode) and the RoSys fixtures.
 test:
 	PYTHONPATH=$(CURDIR)/devkit_driver:$(CURDIR)/devkit_ui:$$PYTHONPATH \
-	PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest -p pytest_asyncio.plugin
+	PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest -p pytest_asyncio.plugin -p rosys.testing.fixtures
 
 ## pre-commit	Run pre-commit hooks on all files.
 pre-commit:
