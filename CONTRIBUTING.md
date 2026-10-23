@@ -20,7 +20,7 @@ Please be respectful and constructive in all interactions.
 
 ### Prerequisites
 
-- Python 3.11+ and pip installed
+- Python 3.12+ and pip installed
 - Git for version control
 
 ### Local Setup

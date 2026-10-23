@@ -17,7 +17,7 @@ jobs:
       - name: set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           cache: "pip"
       - name: install dependencies
         run: pip install -r requirements-dev.txt
