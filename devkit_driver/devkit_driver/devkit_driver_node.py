@@ -17,6 +17,7 @@ from rclpy.node import Node
 from rosgraph_msgs.msg import Clock
 
 from devkit_driver.modules import BMSHandler, BumperHandler, EStopHandler, OdomHandler, RobotBrainHandler, TwistHandler
+from devkit_driver.status import register_status_route
 
 
 class DevkitDriver(Node):
@@ -41,7 +42,7 @@ class DevkitDriver(Node):
             raise TypeError(f'Unknown feldfreund type: {type(self.system.feldfreund)}')
 
         # All other handlers work with both hardware and simulation
-        self._odom_handler = OdomHandler(self, self.system.odometer)
+        self._odom_handler = OdomHandler(self, self.system.odometer, self.system.feldfreund.wheels)
         self._bms_handler = BMSHandler(self, self.system.feldfreund.bms)
         if self.system.feldfreund.bumper is not None:
             self._bumper_handler = BumperHandler(self, self.system.feldfreund.bumper, self.system.feldfreund.estop)
@@ -85,6 +86,7 @@ def on_startup() -> None:
     config = config_from_file(_config_file_path(), secrets=secrets)
     system = System(config, secrets=secrets)
     api.Online()
+    register_status_route(system)
     _state.ros_thread = threading.Thread(target=ros_main, args=(system,), name='ros_spin')
     _state.ros_thread.start()
 

@@ -60,7 +60,6 @@ def _axis_camera_node(channel: int, username: str, password: str) -> Node:
                 'http_port': AXIS_HTTP_PORT,
                 'username': username,
                 'password': password,
-                'use_encrypted_password': False,
                 'frame_id': f'{namespace}/camera',
                 'camera_info_url': '',
                 'stream': 'mjpeg',
