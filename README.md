@@ -63,6 +63,7 @@ The GNSS system uses the [Septentrio GNSS driver](https://github.com/septentrio-
 - `/atteuler`: Attitude in Euler angles
 - `/attcoveuler`: Attitude covariance
 - `/gpsfix`: Detailed GPS fix information including satellites and quality
+- `/navsatfix` (sensor_msgs/NavSatFix): Standard fix message, e.g. for the Foxglove map panel
 - `/aimplusstatus`: AIM+ status information
 
 ### DevKit UI
