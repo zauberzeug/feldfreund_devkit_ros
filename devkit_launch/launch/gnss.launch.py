@@ -5,13 +5,16 @@ import os
 
 import launch
 import launch.logging
+import yaml
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import DeclareLaunchArgument
+from launch import LaunchContext
+from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration, TextSubstitution
-from launch_ros.actions import ComposableNodeContainer, Node
-from launch_ros.descriptions import ComposableNode
+from launch_ros.actions import Node
 
 SERIAL_BAUDRATE = 921600
+# NOTE: right after boot the receiver may not answer yet and the driver aborts; restarting it lets it connect
+RESPAWN_DELAY = 5.0
 
 # Static transforms for the receiver's antenna/sensor frames.
 TF_FRAMES = [
@@ -37,34 +40,6 @@ def generate_launch_description() -> launch.LaunchDescription:
         ]
     )
 
-    serial_port = find_septentrio_port()
-    config = {
-        # NOTE: 'serial://' + path without the leading slash, otherwise the URI ends up with three slashes
-        'device': 'serial://' + serial_port.lstrip('/'),
-        'serial.baudrate': SERIAL_BAUDRATE,
-        'serial.hw_flow_control': 'off'
-    }
-
-    composable_node = ComposableNode(
-        name='septentrio_gnss_driver',
-        package='septentrio_gnss_driver',
-        plugin='rosaic_node::ROSaicNode',
-        parameters=[
-            LaunchConfiguration('path_to_config'),
-            config
-        ]
-    )
-    container = ComposableNodeContainer(
-        name='septentrio_gnss_driver_container',
-        namespace='septentrio_gnss_driver',
-        package='rclcpp_components',
-        executable='component_container_isolated',
-        emulate_tty=True,
-        sigterm_timeout='20',
-        composable_node_descriptions=[composable_node],
-        output='screen'
-    )
-
     tf_publishers = [
         Node(
             package='tf2_ros',
@@ -78,9 +53,33 @@ def generate_launch_description() -> launch.LaunchDescription:
     return launch.LaunchDescription([
         arg_file_name,
         arg_file_path,
-        container,
+        OpaqueFunction(function=_gnss_driver),
         *tf_publishers
     ])
+
+
+def _gnss_driver(context: LaunchContext) -> list[Node]:
+    """Create the GNSS driver node, restarted whenever it exits."""
+    with open(LaunchConfiguration('path_to_config').perform(context), encoding='utf-8') as file:
+        parameters = yaml.safe_load(file)
+    serial_port = find_septentrio_port()
+    config = {
+        # NOTE: 'serial://' + path without the leading slash, otherwise the URI ends up with three slashes
+        'device': 'serial://' + serial_port.lstrip('/'),
+        'serial.baudrate': SERIAL_BAUDRATE,
+        'serial.hw_flow_control': 'off'
+    }
+    return [Node(
+        name='septentrio_gnss_driver',
+        package='septentrio_gnss_driver',
+        executable='septentrio_gnss_driver_node',
+        parameters=[parameters, config],
+        respawn=True,
+        respawn_delay=RESPAWN_DELAY,
+        emulate_tty=True,
+        sigterm_timeout='20',
+        output='screen'
+    )]
 
 
 def find_septentrio_port() -> str:

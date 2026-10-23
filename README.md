@@ -68,6 +68,7 @@ The GNSS system uses the [Septentrio GNSS driver](https://github.com/septentrio-
 - `/atteuler`: Attitude in Euler angles
 - `/attcoveuler`: Attitude covariance
 - `/gpsfix`: Detailed GPS fix information including satellites and quality
+- `/navsatfix` (sensor_msgs/NavSatFix): Standard fix message, e.g. for the Foxglove map panel
 - `/aimplusstatus`: AIM+ status information
 
 ### DevKit UI
@@ -162,7 +163,9 @@ ros2 launch devkit_launch devkit.launch.py
 
 ## AXIS Camera Authentication
 
-The AXIS cameras can be configured to use either digest or basic authentication. To check and configure the authentication mode:
+The AXIS cameras can be configured to use either digest or basic authentication.
+The driver uses basic authentication by default; for a camera that requires digest, set `use_encrypted_password: true` in `config/axis_camera.yaml`.
+To check or change the camera's authentication mode instead:
 
 1. Check current authentication settings:
 

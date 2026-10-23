@@ -9,3 +9,5 @@
     max_zoom: 1
     max_pan_speed: 0.0
     max_tilt_speed: 0.0
+    # true = HTTP digest authentication, false = basic; recent AXIS firmware only accepts digest
+    use_encrypted_password: false
