@@ -42,7 +42,7 @@ class DevkitDriver(Node):
             raise TypeError(f'Unknown feldfreund type: {type(self.system.feldfreund)}')
 
         # All other handlers work with both hardware and simulation
-        self._odom_handler = OdomHandler(self, self.system.odometer)
+        self._odom_handler = OdomHandler(self, self.system.odometer, self.system.feldfreund.wheels)
         self._bms_handler = BMSHandler(self, self.system.feldfreund.bms)
         if self.system.feldfreund.bumper is not None:
             self._bumper_handler = BumperHandler(self, self.system.feldfreund.bumper, self.system.feldfreund.estop)

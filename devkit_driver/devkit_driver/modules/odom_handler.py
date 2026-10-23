@@ -4,17 +4,19 @@ from nav_msgs.msg import Odometry
 from pyquaternion import Quaternion
 from rclpy.node import Node
 from rosys.driving import Odometer
+from rosys.geometry import Velocity
+from rosys.hardware import Wheels
 from tf2_ros import TransformBroadcaster
 
 from .base import Handler
 
 
 class OdomHandler(Handler):
-    """Handle the odometry."""
+    """Publish the odometry with every wheel velocity measurement, also at standstill."""
 
-    def __init__(self, node: Node, odom: Odometer):
+    def __init__(self, node: Node, odometer: Odometer, wheels: Wheels):
         super().__init__(node)
-        self._odom = odom
+        self._odometer = odometer
 
         # Read parameters
         node.declare_parameter('twist_stddev', np.zeros(36).tolist())
@@ -37,14 +39,18 @@ class OdomHandler(Handler):
         # Publisher
         self._publisher = node.create_publisher(Odometry, 'odom', 10)
         self._tf_broadcaster = TransformBroadcaster(self.node)
-        self._odom.POSE_UPDATED.subscribe(self.publish_odom)
-        self.publish_odom()
+        # NOTE: the odometer subscribed at System construction, so its pose already includes the measurement
+        wheels.VELOCITY_MEASURED.subscribe(self.publish_odom)
 
-    def publish_odom(self, *_args) -> None:
-        """Publish odometry data to ros."""
-        if not self.active:
+    def publish_odom(self, velocities: list[Velocity]) -> None:
+        """Publish the odometer pose and the latest measured velocity to ros.
+
+        :param velocities: the velocities of one wheel measurement
+        """
+        if not self.active or not velocities:
             return
-        pose = self._odom.pose
+        pose = self._odometer.pose
+        velocity = velocities[-1]
         timestamp_message = self.node.get_clock().now().to_msg()
         quat = Quaternion(axis=[0, 0, 1], angle=pose.yaw)
         if self._publish_tf:
@@ -60,10 +66,6 @@ class OdomHandler(Handler):
             transform_msg.transform.rotation.z = float(quat.z)
             transform_msg.transform.rotation.w = float(quat.w)
             self._tf_broadcaster.sendTransform(transform_msg)
-        velocity = self._odom.current_velocity
-        if velocity is None:
-            self.log.debug('Velocity is None, skipping publish')
-            return
         self._odom_msg.header.stamp = timestamp_message
         self._odom_msg.pose.pose.position.x = float(pose.x)
         self._odom_msg.pose.pose.position.y = float(pose.y)
