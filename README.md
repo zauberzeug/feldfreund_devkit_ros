@@ -20,7 +20,7 @@ The driver runs against real hardware or, when `FELDFREUND_SIMULATION` is set, a
 Configuration:
 
 - `devkit_launch/config/feldfreund.py`: Hardware configuration of the DevKit (robot brain, wheels/ODrive, bumpers, IMU, ...), assembled via `feldfreund_devkit`.
-- `devkit_launch/config/devkit.yaml`: ROS2 parameters for the driver node (odometry covariances `pose_stddev` / `twist_stddev` and `publish_tf`).
+- `devkit_launch/config/devkit.yaml`: ROS2 parameters for the driver node (odometry covariances `pose_stddev` / `twist_stddev`, `publish_tf` and `cmd_vel_timeout`).
 
 Published topics (driver → ROS):
 
@@ -42,6 +42,9 @@ Subscribed topics (ROS → driver):
 - `/esp/reset` (std_msgs/Empty): Reset the robot brain (hardware mode)
 - `/esp/restart` (std_msgs/Empty): Restart the robot brain (hardware mode)
 - `/esp/configure` (std_msgs/Empty): Send the Lizard configuration to the robot brain (hardware mode)
+
+If no `/cmd_vel` message arrives for longer than `cmd_vel_timeout` seconds (default 0.5) while the robot drives, the driver stops the wheels.
+They stay stopped until the next message arrives.
 
 ### Camera System
 

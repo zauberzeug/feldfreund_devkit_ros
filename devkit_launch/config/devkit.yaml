@@ -6,6 +6,7 @@
     pose_stddev: [0.1, 0.1, 0.0, 0.0, 0.0, 0.1] # [m]
     twist_stddev: [0.01, 0.0, 0.0, 0.0, 0.0, 0.01] # [m/s]
     publish_tf: True
+    cmd_vel_timeout: 0.5 # [s] Stop the wheels when no cmd_vel arrived for this long
     expander_name: "p0" # Name of the expander in the lizard configuration
     flash_parameters: "-j orin --nand" # Parameters for espresso.py (e.g., "-j orin --nand" for "flash.py orin nand v05")
     serial_port: "/dev/ttyTHS0" # This needs to be in the docker-compose.yml file as well
